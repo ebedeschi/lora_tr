@@ -1,7 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : mxconstants.h
-  * Description        : This file contains the common defines of the application
+  * File Name          : ADC.h
+  * Description        : This file provides code for the configuration
+  *                      of the ADC instances.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2016 STMicroelectronics
@@ -31,55 +32,44 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MXCONSTANT_H
-#define __MXCONSTANT_H
-  /* Includes ------------------------------------------------------------------*/
+#ifndef __adc_H
+#define __adc_H
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "stm32l4xx_hal.h"
 
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-/* Private define ------------------------------------------------------------*/
+extern ADC_HandleTypeDef hadc3;
 
-#define ADCEN_Pin GPIO_PIN_13
-#define ADCEN_GPIO_Port GPIOC
-#define ADC_VBAT_Pin GPIO_PIN_0
-#define ADC_VBAT_GPIO_Port GPIOC
-#define RADIO_NSS_Pin GPIO_PIN_4
-#define RADIO_NSS_GPIO_Port GPIOA
-#define RADIO_SCLK_Pin GPIO_PIN_5
-#define RADIO_SCLK_GPIO_Port GPIOA
-#define RADIO_MISO_Pin GPIO_PIN_6
-#define RADIO_MISO_GPIO_Port GPIOA
-#define RADIO_MOSI_Pin GPIO_PIN_7
-#define RADIO_MOSI_GPIO_Port GPIOA
-#define RADIO_NRESET_Pin GPIO_PIN_12
-#define RADIO_NRESET_GPIO_Port GPIOB
-#define RFPOWER_Pin GPIO_PIN_13
-#define RFPOWER_GPIO_Port GPIOB
-#define RADIO_DIO0_Pin GPIO_PIN_14
-#define RADIO_DIO0_GPIO_Port GPIOB
-#define RADIO_DIO1_Pin GPIO_PIN_15
-#define RADIO_DIO1_GPIO_Port GPIOB
-#define RADIO_DIO2_Pin GPIO_PIN_6
-#define RADIO_DIO2_GPIO_Port GPIOC
-#define RADIO_DIO3_Pin GPIO_PIN_7
-#define RADIO_DIO3_GPIO_Port GPIOC
-#define LED1_Pin GPIO_PIN_8
-#define LED1_GPIO_Port GPIOC
-#define LED2_Pin GPIO_PIN_9
-#define LED2_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-/**
-  * @}
-  */ 
+extern void Error_Handler(void);
+
+void MX_ADC3_Init(void);
+
+/* USER CODE BEGIN Prototypes */
+
+/* USER CODE END Prototypes */
+
+#ifdef __cplusplus
+}
+#endif
+#endif /*__ adc_H */
 
 /**
   * @}
-*/ 
+  */
 
-#endif /* __MXCONSTANT_H */
+/**
+  * @}
+  */
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

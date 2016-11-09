@@ -32,6 +32,7 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
+#include "adc.h"
 #include "i2c.h"
 #include "rtc.h"
 #include "spi.h"
@@ -43,6 +44,7 @@
 #include "hw.h"
 #include "lora.h"
 #include "timeServer.h"
+#include "SHT2x/SHT2x.h"
 #include "vcom.h"
 #include "version.h"
 
@@ -74,6 +76,11 @@
 extern SPI_HandleTypeDef hspi;
 extern RTC_HandleTypeDef RtcHandle;
 
+char Buffer[100];
+uint16_t sT;
+float   temperatureC;           //variable for temperature[°C] as float
+uint8_t  error = 0;              //variable for error code. For codes see system.h
+
 /* call back when LoRa will transmit a frame*/
 static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed);
 
@@ -99,7 +106,7 @@ static  LoRaParam_t LoRaParamInit= {TX_ON_TIMER,
                                     APP_TX_DUTYCYCLE,
                                     CLASS_A,
                                     LORAWAN_ADR_ON,
-									DR_2,
+									DR_5,
                                     LORAWAN_PUBLIC_NETWORK };
 
 /* USER CODE END PV */
@@ -138,11 +145,45 @@ int main(void)
   MX_SPI1_Init();
   MX_USART3_UART_Init();
   MX_RTC_Init();
+  MX_ADC3_Init();
 
   /* USER CODE BEGIN 2 */
 
+//  	char word[20];
+//  	error |= SHT2x_MeasureHM(TEMP, &sT);
+//  	temperatureC = SHT2x_CalcTemperatureC(sT);
+//  	int d1 = temperatureC;
+//  	float f2 = temperatureC - d1;
+//  	int d2 = trunc(f2 * 10000);
+//  	sprintf(word,"%d.%04d", d1, d2);
+//  	int i = 0;
+//  	for(i = 0; i<strlen(word); i++){
+//  	sprintf(Buffer+i*2, "%02X", word[i]);
+//  	}
+//  	PRINTF("%s\n", Buffer);
+
+//  uint32_t g_ADCValue = 0;
+//  double con = 0.00118359375;
+////  double con = 0.0023671875;
+//  double v = 0;
+//
+//  HAL_GPIO_WritePin(ADCEN_GPIO_Port, ADCEN_Pin, GPIO_PIN_SET);
+//
+//  HAL_ADC_Start(&hadc3);
+//
+//  if (HAL_ADC_PollForConversion(&hadc3, 1000000) == HAL_OK)
+//  {
+//      g_ADCValue = HAL_ADC_GetValue(&hadc3);
+//  }
+//
+//  v = con * g_ADCValue;
+
+
   HAL_GPIO_WritePin(RFPOWER_GPIO_Port, RFPOWER_Pin, GPIO_PIN_RESET);
+//  HAL_Delay(1000); //delay
   HAL_GPIO_WritePin(RADIO_NRESET_GPIO_Port, RADIO_NRESET_Pin, GPIO_PIN_SET);
+
+//  HAL_Delay(1000); //delay
 
   hspi = hspi1;
 
@@ -168,9 +209,11 @@ int main(void)
 
   /* USER CODE BEGIN 3 */
 
-	  PRINTF("Hello\r\n");
+
+
+//	  PRINTF("Hello\r\n");
 	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-	  HAL_Delay(5000); //delay
+	  HAL_Delay(30000); //delay
   }
   /* USER CODE END 3 */
 
@@ -214,10 +257,18 @@ void SystemClock_Config(void)
   }
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART3
-                              |RCC_PERIPHCLK_I2C1;
+                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
+  PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_PLLSAI1;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
+  PeriphClkInit.PLLSAI1.PLLSAI1Source = RCC_PLLSOURCE_MSI;
+  PeriphClkInit.PLLSAI1.PLLSAI1M = 1;
+  PeriphClkInit.PLLSAI1.PLLSAI1N = 16;
+  PeriphClkInit.PLLSAI1.PLLSAI1P = RCC_PLLP_DIV7;
+  PeriphClkInit.PLLSAI1.PLLSAI1Q = RCC_PLLQ_DIV2;
+  PeriphClkInit.PLLSAI1.PLLSAI1R = RCC_PLLR_DIV2;
+  PeriphClkInit.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_ADC1CLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -252,18 +303,32 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
   *IsTxConfirmed =  LORAWAN_CONFIRMED_MSG;
 
-  AppData->Buff[i++] = 'c';
-  AppData->Buff[i++] = 'i';
-  AppData->Buff[i++] = 'a';
-  AppData->Buff[i++] = 'o';
-  AppData->Buff[i++] = ' ';
-  AppData->Buff[i++] = 'm';
-  AppData->Buff[i++] = 'o';
-  AppData->Buff[i++] = 'n';
-  AppData->Buff[i++] = 'd';
-  AppData->Buff[i++] = 'o';
+	char word[20];
+	error |= SHT2x_MeasureHM(TEMP, &sT);
+	temperatureC = SHT2x_CalcTemperatureC(sT);
+	int d1 = temperatureC;
+	float f2 = temperatureC - d1;
+	int d2 = trunc(f2 * 10000);
+	sprintf(word,"%d.%04d", d1, d2);
+//	for(i = 0; i<strlen(word); i++){
+//	sprintf(Buffer+i*2, "%02X", word[i]);
+//	}
+//	PRINTF("%s\n", Buffer);
+	strcpy(AppData->Buff, word);
+	PRINTF("%s\n", AppData->Buff);
 
-  AppData->BuffSize = i;
+//  AppData->Buff[i++] = 'c';
+//  AppData->Buff[i++] = 'i';
+//  AppData->Buff[i++] = 'a';
+//  AppData->Buff[i++] = 'o';
+//  AppData->Buff[i++] = ' ';
+//  AppData->Buff[i++] = 'm';
+//  AppData->Buff[i++] = 'o';
+//  AppData->Buff[i++] = 'n';
+//  AppData->Buff[i++] = 'd';
+//  AppData->Buff[i++] = 'o';
+
+  AppData->BuffSize = strlen(AppData->Buff);
 }
 
 static void LoraRxData( lora_AppData_t *AppData )
