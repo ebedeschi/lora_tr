@@ -101,13 +101,13 @@ void HW_Init( void )
 #endif
 
 //    HW_AdcInit( );
-
-    Radio.IoInit( );
     
 //    HW_SPI_Init( );
 
     HW_RTC_Init( );
     
+    Radio.IoInit( );
+
     vcom_Init( );
     
 //    BSP_sensor_Init( );

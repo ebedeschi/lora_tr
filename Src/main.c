@@ -47,6 +47,7 @@
 #include "SHT2x/SHT2x.h"
 #include "vcom.h"
 #include "version.h"
+#include "radio.h"
 
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
@@ -121,6 +122,8 @@ void Error_Handler(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+void fai()
+{}
 
 /* USER CODE END 0 */
 
@@ -182,7 +185,6 @@ int main(void)
   HAL_GPIO_WritePin(RFPOWER_GPIO_Port, RFPOWER_Pin, GPIO_PIN_RESET);
 //  HAL_Delay(1000); //delay
   HAL_GPIO_WritePin(RADIO_NRESET_GPIO_Port, RADIO_NRESET_Pin, GPIO_PIN_SET);
-
 //  HAL_Delay(1000); //delay
 
   hspi = hspi1;
@@ -191,9 +193,20 @@ int main(void)
   HW_Init( );
 
   /* Configure the Lora Stack*/
-  lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
+//  lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
+//
+//  PRINTF("VERSION: %X\n", VERSION);
 
-  PRINTF("VERSION: %X\n", VERSION);
+  char b[50]={'\0'};
+  uint8_t blen = 0;
+  RadioEvents_t re;
+  re.TxDone = fai;
+  re.RxDone = fai;
+  re.RxError = fai;
+  re.TxTimeout = fai;
+  re.RxTimeout = fai;
+  Radio.Init( &re );
+  Radio.SetChannel( 863000000 );
 
 
   /* USER CODE END 2 */
@@ -203,15 +216,25 @@ int main(void)
   while (1)
   {
 	  /* run the LoRa class A state machine*/
-	  lora_fsm( );
+//	  lora_fsm( );
 
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+		char word[20];
+		error |= SHT2x_MeasureHM(TEMP, &sT);
+		temperatureC = SHT2x_CalcTemperatureC(sT);
+		int d1 = temperatureC;
+		float f2 = temperatureC - d1;
+		int d2 = trunc(f2 * 10000);
+		sprintf(word,"%d.%04d", d1, d2);
 
+	  sprintf(b, "%d:%s:%d:%d", 3, word, 1, 5);
+	  blen = strlen(b);
+	  Radio.SetTxConfig( MODEM_LORA, 5, 0, 0, 12, 4, 8, false, true, 0, 0, false, 3000 );
+	  Radio.Send( b, blen );
 
-
-//	  PRINTF("Hello\r\n");
+	  //	  PRINTF("Hello\r\n");
 	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 	  HAL_Delay(30000); //delay
   }

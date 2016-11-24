@@ -265,7 +265,7 @@ void SX1276Init( RadioEvents_t *events )
     TimerInit( &RxTimeoutTimer, SX1276OnTimeoutIrq );
     TimerInit( &RxTimeoutSyncWord, SX1276OnTimeoutIrq );
 
-//    SX1276Reset( );
+    SX1276Reset( );
 
     RxChainCalibration( );
 
