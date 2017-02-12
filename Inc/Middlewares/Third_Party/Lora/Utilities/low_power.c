@@ -130,30 +130,30 @@ uint32_t LowPower_GetState( void )
 
 void LowPower_Handler( void )
 {
-  DBG_GPIO_RST(GPIOB, GPIO_PIN_15);
+//  DBG_GPIO_RST(GPIOB, GPIO_PIN_15);
   
-  DBG_GPIO_RST(GPIOB, GPIO_PIN_14);
+//  DBG_GPIO_RST(GPIOB, GPIO_PIN_14);
   
   if ( LowPower_State == 0 )
   {
-    DBG_PRINTF("dz\n");
+//    DBG_PRINTF("dz\n");
     
     HW_EnterStopMode( );
     
     /* mcu dependent. to be implemented by user*/
     HW_ExitStopMode();
     
-    DBG_GPIO_SET(GPIOB, GPIO_PIN_15);
+//    DBG_GPIO_SET(GPIOB, GPIO_PIN_15);
     
     HW_RTC_setMcuWakeUpTime( );
   }
   else
   {
-    DBG_PRINTF("z\n");
+//    DBG_PRINTF("z\n");
     
     HW_EnterSleepMode( );
 
-    DBG_GPIO_SET(GPIOB, GPIO_PIN_14);
+//    DBG_GPIO_SET(GPIOB, GPIO_PIN_14);
   }
   
 }

@@ -4,7 +4,7 @@
   * Description        : This file contains the common defines of the application
   ******************************************************************************
   *
-  * COPYRIGHT(c) 2016 STMicroelectronics
+  * COPYRIGHT(c) 2017 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -45,6 +45,16 @@
 #define ADCEN_GPIO_Port GPIOC
 #define ADC_VBAT_Pin GPIO_PIN_0
 #define ADC_VBAT_GPIO_Port GPIOC
+#define PSQ1_Pin GPIO_PIN_1
+#define PSQ1_GPIO_Port GPIOC
+#define PSQ2_Pin GPIO_PIN_2
+#define PSQ2_GPIO_Port GPIOC
+#define PSQ3_Pin GPIO_PIN_3
+#define PSQ3_GPIO_Port GPIOC
+#define DE_Pin GPIO_PIN_0
+#define DE_GPIO_Port GPIOA
+#define RE_Pin GPIO_PIN_1
+#define RE_GPIO_Port GPIOA
 #define RADIO_NSS_Pin GPIO_PIN_4
 #define RADIO_NSS_GPIO_Port GPIOA
 #define RADIO_SCLK_Pin GPIO_PIN_5

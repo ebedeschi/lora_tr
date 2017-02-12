@@ -269,8 +269,8 @@ void HW_RTC_setMcuWakeUpTime( void )
     McuWakeUpTimeInitialized = true;
     now = HW_RTC_GetCalendarValue( &RTC_DateStruct, &RTC_TimeStruct );
 
-    DBG_GPIO_SET(GPIOB, GPIO_PIN_13);
-    DBG_GPIO_RST(GPIOB, GPIO_PIN_13);
+//    DBG_GPIO_SET(GPIOB, GPIO_PIN_13);
+//    DBG_GPIO_RST(GPIOB, GPIO_PIN_13);
     HAL_RTC_GetAlarm(&RtcHandle, &RTC_AlarmStructure, RTC_ALARM_A, RTC_FORMAT_BIN );
     hit = RTC_AlarmStructure.AlarmTime.Seconds+
           60*(RTC_AlarmStructure.AlarmTime.Minutes+
@@ -280,7 +280,7 @@ void HW_RTC_setMcuWakeUpTime( void )
       
     McuWakeUpTime = (int16_t) ((now-hit));
     McuWakeUpTimeCal += McuWakeUpTime;
-    DBG_PRINTF("Cal=%d, %d\n",McuWakeUpTimeCal, McuWakeUpTime);
+//    DBG_PRINTF("Cal=%d, %d\n",McuWakeUpTimeCal, McuWakeUpTime);
   }
 }
 

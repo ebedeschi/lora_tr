@@ -65,29 +65,29 @@ extern UART_HandleTypeDef huart3;
 
 void vcom_Init(void)
 {
-//  /*## Configure the UART peripheral ######################################*/
-//  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-//  /* UART1 configured as follow:
-//      - Word Length = 8 Bits
-//      - Stop Bit = One Stop bit
-//      - Parity = ODD parity
-//      - BaudRate = 921600 baud
-//      - Hardware flow control disabled (RTS and CTS signals) */
-//  UartHandle.Instance        = USARTX;
-//
-//  UartHandle.Init.BaudRate   = 921600/*115200*/;
-//  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-//  UartHandle.Init.StopBits   = UART_STOPBITS_1;
-//  UartHandle.Init.Parity     = UART_PARITY_NONE;
-//  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
-//  UartHandle.Init.Mode       = UART_MODE_TX_RX;
-//
-//  if(HAL_UART_Init(&UartHandle) != HAL_OK)
-//  {
-//    /* Initialization Error */
-//    Error_Handler();
-//  }
-	UartHandle = huart3;
+  /*## Configure the UART peripheral ######################################*/
+  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
+  /* UART1 configured as follow:
+      - Word Length = 8 Bits
+      - Stop Bit = One Stop bit
+      - Parity = ODD parity
+      - BaudRate = 9600 baud
+      - Hardware flow control disabled (RTS and CTS signals) */
+  UartHandle.Instance        = USART3;
+
+  UartHandle.Init.BaudRate   = 9600/*115200*/;
+  UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
+  UartHandle.Init.StopBits   = UART_STOPBITS_1;
+  UartHandle.Init.Parity     = UART_PARITY_NONE;
+  UartHandle.Init.HwFlowCtl  = UART_HWCONTROL_NONE;
+  UartHandle.Init.Mode       = UART_MODE_TX_RX;
+
+  if(HAL_UART_Init(&UartHandle) != HAL_OK)
+  {
+    /* Initialization Error */
+    Error_Handler();
+  }
+//	UartHandle = huart3;
 }
 
 
