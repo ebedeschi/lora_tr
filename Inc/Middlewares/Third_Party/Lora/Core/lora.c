@@ -667,7 +667,7 @@ void lora_fsm( void)
       if( ComplianceTest.Running == true )
       {
           // Schedule next packet transmission as soon as possible
-          TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
+          TimerSetValue( &TxNextPacketTimer,  10000); /* 5s */
           TimerStart( &TxNextPacketTimer );
       }
       else if (LoRaParam->TxEvent == TX_ON_TIMER )

@@ -93,8 +93,8 @@ Maintainer: Miguel Luis and Gregory Cristian
  *
  * \remark see STATIC_DEVICE_EUI comments
  */
-#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 }
-
+//#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 }
+#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 }
 
 /*!
  * Application IEEE EUI (big endian)
@@ -104,14 +104,16 @@ Maintainer: Miguel Luis and Gregory Cristian
 /*!
  * AES encryption/decryption cipher application key
  */
-#define LORAWAN_APPLICATION_KEY                     { 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F }
+//#define LORAWAN_APPLICATION_KEY                     { 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F }
+#define LORAWAN_APPLICATION_KEY                     { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4A, 0x4B, 0x4C, 0x4D, 0x4E, 0x4F }
 
 #if( OVER_THE_AIR_ACTIVATION == 0 )
 
 /*!
  * Current network ID
  */
-#define LORAWAN_NETWORK_ID                          ( uint32_t )0
+//#define LORAWAN_NETWORK_ID                          ( uint32_t )0
+#define LORAWAN_NETWORK_ID                          ( uint32_t )10
 
 /*!
  * When set to 1 DevAdd is LORAWAN_DEVICE_ADDRESS
@@ -119,23 +121,24 @@ Maintainer: Miguel Luis and Gregory Cristian
  *         a pseudo random generator seeded with a value derived from
  *         BoardUniqueId value
  */
-#define STATIC_DEVICE_ADDRESS                     0
+//#define STATIC_DEVICE_ADDRESS                     0
+#define STATIC_DEVICE_ADDRESS                     1
 /*!
  * Device address on the network (big endian)
  *
  * \remark see STATIC_DEVICE_ADDRESS comments
  */
-#define LORAWAN_DEVICE_ADDRESS                      ( uint32_t )0x0100000a
+#define LORAWAN_DEVICE_ADDRESS                      ( uint32_t )0x0000000A
 
 /*!
  * AES encryption/decryption cipher network session key
  */
-#define LORAWAN_NWKSKEY                             { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C }
+#define LORAWAN_NWKSKEY                             { 0xAA, 0xAA, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C }
 
 /*!
  * AES encryption/decryption cipher application session key
  */
-#define LORAWAN_APPSKEY                             { 0x2B, 0x7E, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C }
+#define LORAWAN_APPSKEY                             { 0xAA, 0xAA, 0x15, 0x16, 0x28, 0xAE, 0xD2, 0xA6, 0xAB, 0xF7, 0x15, 0x88, 0x09, 0xCF, 0x4F, 0x3C }
 
 #endif /* OVER_THE_AIR_ACTIVATION == 0 */
 

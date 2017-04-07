@@ -101,6 +101,16 @@ void MX_RTC_Init(void)
     Error_Handler();
   }
 
+    /**Enable the Alarm B 
+    */
+  sAlarm.AlarmMask = RTC_ALARMMASK_SECONDS;
+  sAlarm.AlarmDateWeekDay = 0x1;
+  sAlarm.Alarm = RTC_ALARM_B;
+  if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
 }
 
 void HAL_RTC_MspInit(RTC_HandleTypeDef* rtcHandle)
@@ -185,6 +195,11 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef* rtcHandle)
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
   TimerIrqHandler( );
+}
+
+void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
+{
+
 }
 
 /* USER CODE END 1 */

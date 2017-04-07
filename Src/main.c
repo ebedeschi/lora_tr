@@ -47,6 +47,7 @@
 #include "SHT2x/SHT2x.h"
 #include "vcom.h"
 #include "version.h"
+#include "libtime/libtime.h"
 
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
@@ -80,6 +81,8 @@ char Buffer[100];
 uint16_t sT;
 float   temperatureC;           //variable for temperature[°C] as float
 uint8_t  error = 0;              //variable for error code. For codes see system.h
+
+struct TimeStampStruct myTs;
 
 TimerEvent_t wakeup;
 
@@ -203,6 +206,7 @@ int main(void)
 
   PRINTF("VERSION: %X\n", VERSION);
 
+  initTimeStampStruct(&myTs);
 
   /* USER CODE END 2 */
 
@@ -316,23 +320,34 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
   batteryLevel = HW_GetBatteryLevel( );                     /* 1 (very low) to 254 (fully charged) */
 
-  AppData->Port = LORAWAN_APP_PORT;
+  //AppData->Port = LORAWAN_APP_PORT;
+
+  AppData->Port = 6;
 
   *IsTxConfirmed =  LORAWAN_CONFIRMED_MSG;
 
-	char word[20];
-	error |= SHT2x_MeasureHM(TEMP, &sT);
-	temperatureC = SHT2x_CalcTemperatureC(sT);
-	int d1 = temperatureC;
-	float f2 = temperatureC - d1;
-	int d2 = trunc(f2 * 10000);
-	sprintf(word,"%d.%04d", d1, d2);
-//	for(i = 0; i<strlen(word); i++){
-//	sprintf(Buffer+i*2, "%02X", word[i]);
-//	}
-//	PRINTF("%s\n", Buffer);
-	strcpy(AppData->Buff, word);
-	PRINTF("%s\n", AppData->Buff);
+  AppData->Buff[i++] = 's';
+  AppData->Buff[i++] = 'i';
+  AppData->Buff[i++] = 'n';
+  AppData->Buff[i++] = 'c';
+
+  AppData->BuffSize = i;
+
+//	char word[20];
+//	error |= SHT2x_MeasureHM(TEMP, &sT);
+//	temperatureC = SHT2x_CalcTemperatureC(sT);
+//	int d1 = temperatureC;
+//	float f2 = temperatureC - d1;
+//	int d2 = trunc(f2 * 10000);
+//	sprintf(word,"%d.%04d", d1, d2);
+////	for(i = 0; i<strlen(word); i++){
+////	sprintf(Buffer+i*2, "%02X", word[i]);
+////	}
+////	PRINTF("%s\n", Buffer);
+//	strcpy(AppData->Buff, word);
+//	PRINTF("%s\n", AppData->Buff);
+
+//  AppData->BuffSize = strlen(AppData->Buff);
 
 //  AppData->Buff[i++] = 'c';
 //  AppData->Buff[i++] = 'i';
@@ -345,16 +360,29 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 //  AppData->Buff[i++] = 'd';
 //  AppData->Buff[i++] = 'o';
 
-  AppData->BuffSize = strlen(AppData->Buff);
+
 }
 
 static void LoraRxData( lora_AppData_t *AppData )
 {
+  uint8_t s = 0;
+  unsigned long long ts = 0;
+  unsigned long long nl=0;
   switch (AppData->Port)
   {
   case LORAWAN_APP_PORT:
 	  for(int i=0; i<AppData->BuffSize; i++)
 		  PRINTF("%c", (char)(AppData->Buff[i]));
+    break;
+  case 6:
+	  for(int i=(AppData->BuffSize-1); i>=0; i--)
+	  {
+		  nl = (AppData->Buff[i]);
+		  ts |= nl << s;
+		  s+=8;
+	  }
+	  myTs = getTimeStampStructfromMillisec(ts);
+	  printTime(myTs);
     break;
   default:
     break;
