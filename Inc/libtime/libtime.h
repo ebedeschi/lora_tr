@@ -14,7 +14,6 @@ struct TimeStampStruct{
 	struct timeval tv;	// second & subsecond
 };
 
-extern long long RTCNTPDelay;
 
 struct TimeStampStruct global_ts;
 
@@ -34,11 +33,9 @@ void printTime(struct TimeStampStruct ts);
 
 void printRTC();
 
-void setRTCDelay(long long delay);
+uint64_t getMicrosec(struct TimeStampStruct ts);
 
-unsigned long long getMicrosec(struct TimeStampStruct ts);
+struct TimeStampStruct getTimeStampStructfromMicrosec(uint64_t microsecond);
 
-struct TimeStampStruct getTimeStampStructfromMicrosec(unsigned long long microsecond);
-
-struct TimeStampStruct getTimeStampStructfromMillisec(unsigned long long millisecond);
+struct TimeStampStruct getTimeStampStructfromMillisec(uint64_t millisecond);
 

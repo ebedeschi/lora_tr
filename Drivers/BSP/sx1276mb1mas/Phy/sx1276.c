@@ -62,6 +62,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
  * Local types definition
  */
 
+extern struct TimeStampStruct sendTs;
 
 /*!
  * Radio registers definition
@@ -1639,7 +1640,10 @@ void SX1276OnDio0Irq( void )
                 if( ( RadioEvents != NULL ) && ( RadioEvents->TxDone != NULL ) )
                 {
                     RadioEvents->TxDone( );
+                    sendTs = getRTCTime();
                    PRINTF("txDone\n");
+                   PRINTF("Send time\r\n");
+                   printTime(sendTs);
                 }
                 break;
             }

@@ -105,7 +105,7 @@ void setRTCTime(struct TimeStampStruct ts)
 
 }
 
-struct TimeStampStruct getTimeStampStructfromMicrosec(unsigned long long microsecond)
+struct TimeStampStruct getTimeStampStructfromMicrosec(uint64_t microsecond)
 {
 	struct TimeStampStruct ts;
 
@@ -119,7 +119,7 @@ struct TimeStampStruct getTimeStampStructfromMicrosec(unsigned long long microse
 	return ts;
 }
 
-struct TimeStampStruct getTimeStampStructfromMillisec(unsigned long long millisecond)
+struct TimeStampStruct getTimeStampStructfromMillisec(uint64_t millisecond)
 {
 	struct TimeStampStruct ts;
 
@@ -168,12 +168,6 @@ void printTime(struct TimeStampStruct ts)
 
 }
 
-void setRTCDelay(long long delay)
-{
-	if(delay<1000000)
-		RTCNTPDelay = delay;
-}
-
 void printRTC()
 {
 	struct TimeStampStruct ts;
@@ -181,13 +175,13 @@ void printRTC()
 	printTime(ts);
 }
 
-unsigned long long getMicrosec(struct TimeStampStruct ts)
+uint64_t getMicrosec(struct TimeStampStruct ts)
 {
-	return ((unsigned long long)((ts.tv.tv_sec)) * 1000000) + (unsigned long long)(ts.tv.tv_usec);
+	return (((uint64_t)(ts.tv.tv_sec)) * 1000000) + (uint64_t)(ts.tv.tv_usec);
 }
 
-unsigned long long getMillisec(struct TimeStampStruct ts)
+uint64_t getMillisec(struct TimeStampStruct ts)
 {
-	return ((unsigned long long)((ts.tv.tv_sec)) * 1000000) + ( (unsigned long long)(ts.tv.tv_usec) / 1000 );
+	return (((uint64_t)(ts.tv.tv_sec)) * 1000000) + ( (uint64_t)(ts.tv.tv_usec) / 1000 );
 }
 

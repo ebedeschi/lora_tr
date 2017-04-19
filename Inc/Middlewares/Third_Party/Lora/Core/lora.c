@@ -664,10 +664,12 @@ void lora_fsm( void)
           PrepareTxFrame( );
           NextTx = SendFrame( );
       }
+      PRINTF("-----------------------------------\n");
+      HAL_Delay(10000);
       if( ComplianceTest.Running == true )
       {
           // Schedule next packet transmission as soon as possible
-          TimerSetValue( &TxNextPacketTimer,  10000); /* 5s */
+          TimerSetValue( &TxNextPacketTimer,  30000); /* 5s */
           TimerStart( &TxNextPacketTimer );
       }
       else if (LoRaParam->TxEvent == TX_ON_TIMER )
