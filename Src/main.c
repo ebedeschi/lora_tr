@@ -206,7 +206,7 @@ int main(void)
   re.TxTimeout = fai;
   re.RxTimeout = fai;
   Radio.Init( &re );
-  Radio.SetChannel( 863000000 );
+  Radio.SetChannel( 868000000 );
 
 
   /* USER CODE END 2 */
@@ -231,12 +231,12 @@ int main(void)
 
 	  sprintf(b, "%d:%s:%d:%d", 3, word, 1, 5);
 	  blen = strlen(b);
-	  Radio.SetTxConfig( MODEM_LORA, 5, 0, 0, 12, 4, 8, false, true, 0, 0, false, 3000 );
+	  Radio.SetTxConfig( MODEM_LORA, 5, 0, 0, 7, 1, 8, false, true, 0, 0, false, 3000 );
 	  Radio.Send( b, blen );
 
 	  //	  PRINTF("Hello\r\n");
 	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-	  HAL_Delay(30000); //delay
+	  HAL_Delay(5000); //delay
   }
   /* USER CODE END 3 */
 

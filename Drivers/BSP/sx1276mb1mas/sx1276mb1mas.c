@@ -134,7 +134,7 @@ void SX1276IoDeInit( void )
 uint8_t SX1276GetPaSelect( uint32_t channel )
 {
 	return RF_PACONFIG_PASELECT_PABOOST;
-//    return RF_PACONFIG_PASELECT_RFO;
+	//    return RF_PACONFIG_PASELECT_RFO;
 }
 
 
