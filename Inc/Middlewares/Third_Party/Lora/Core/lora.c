@@ -111,7 +111,7 @@ static uint8_t AppSKey[] = LORAWAN_APPSKEY;
 static uint32_t DevAddr = LORAWAN_DEVICE_ADDRESS;
 
 #endif
-
+extern bool packet_sinc;
 /*!
  * User application data buffer size
  */
@@ -655,6 +655,7 @@ void lora_fsm( void)
     {
       PRINTF("JOINED\n");
       DeviceState = DEVICE_STATE_SEND;
+      packet_sinc = true;
       break;
     }
     case DEVICE_STATE_SEND:
@@ -664,20 +665,31 @@ void lora_fsm( void)
           PrepareTxFrame( );
           NextTx = SendFrame( );
       }
-      PRINTF("-----------------------------------\n");
-      HAL_Delay(10000);
-      if( ComplianceTest.Running == true )
+      if (packet_sinc == false)
       {
-          // Schedule next packet transmission as soon as possible
-          TimerSetValue( &TxNextPacketTimer,  30000); /* 5s */
-          TimerStart( &TxNextPacketTimer );
+		  PRINTF("---------------down----------------\n");
+		  HAL_Delay(10000);
+		  if( ComplianceTest.Running == true )
+		  {
+			  // Schedule next packet transmission as soon as possible
+			  TimerSetValue( &TxNextPacketTimer,  30000); /* 5s */
+			  TimerStart( &TxNextPacketTimer );
+		  }
+		  else if (LoRaParam->TxEvent == TX_ON_TIMER )
+		  {
+			  // Schedule next packet transmission
+			  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
+			  TimerStart( &TxNextPacketTimer );
+		  }
       }
-      else if (LoRaParam->TxEvent == TX_ON_TIMER )
+      else
       {
-          // Schedule next packet transmission
-          TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
-          TimerStart( &TxNextPacketTimer );
+		  PRINTF("---------------sinc----------------\n");
+		  // Schedule next packet transmission as soon as possible
+		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
+		  TimerStart( &TxNextPacketTimer );
       }
+
 
       DeviceState = DEVICE_STATE_SLEEP;
       break;

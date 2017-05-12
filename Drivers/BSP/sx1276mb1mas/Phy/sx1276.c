@@ -57,7 +57,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "sx1276mb1mas.h"
 #include <string.h>
 
-
+extern bool  packet_sinc;
 /*
  * Local types definition
  */
@@ -1639,11 +1639,16 @@ void SX1276OnDio0Irq( void )
                 SX1276.Settings.State = RF_IDLE;
                 if( ( RadioEvents != NULL ) && ( RadioEvents->TxDone != NULL ) )
                 {
-                    RadioEvents->TxDone( );
-                    sendTs = getRTCTime();
-                   PRINTF("txDone\n");
-                   PRINTF("Send time\r\n");
-                   printTime(sendTs);
+                	if(packet_sinc == true)
+                		sendTs = getRTCTime();
+                   RadioEvents->TxDone( );
+                   if(packet_sinc == true)
+                   {
+					   PRINTF("txDone\n");
+					   PRINTF("Send time\r\n");
+					   printTime(sendTs);
+                   }
+                   packet_sinc=!packet_sinc;
                 }
                 break;
             }

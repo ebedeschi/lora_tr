@@ -103,7 +103,7 @@ void MX_RTC_Init(void)
 
     /**Enable the Alarm B 
     */
-  sAlarm.AlarmMask = RTC_ALARMMASK_ALL;
+  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
   sAlarm.AlarmDateWeekDay = 0x1;
   sAlarm.Alarm = RTC_ALARM_B;
   if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
@@ -200,18 +200,25 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
+	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 }
 
-void setAlarm(int WeekDay)
+void setAlarm()
 {
 	RTC_AlarmTypeDef sAlarm;
 
-//	HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD);
+//	sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+//	sAlarm.AlarmDateWeekDay = 0x1;
+//	sAlarm.Alarm = RTC_ALARM_B;
+//	if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
+//	{
+//	Error_Handler();
+//	}
 
     /**Enable the Alarm B
     */
 	sAlarm.AlarmMask = RTC_ALARMMASK_ALL;
-	sAlarm.AlarmDateWeekDay = 0x01;//WeekDay;
+	sAlarm.AlarmDateWeekDay = 0x01;
 	sAlarm.Alarm = RTC_ALARM_B;
 	if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
 	{

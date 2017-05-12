@@ -83,10 +83,12 @@ uint16_t sT;
 float   temperatureC;           //variable for temperature[°C] as float
 uint8_t  error = 0;              //variable for error code. For codes see system.h
 
-struct TimeStampStruct myTs;
+struct TimeStampStruct sincTs;
 struct TimeStampStruct sendTs;
 
-bool  sinc = false;
+bool  sinc = true;
+
+bool  packet_sinc = false;
 
 TimerEvent_t wakeup;
 
@@ -216,10 +218,11 @@ int main(void)
 
   PRINTF("VERSION: %X\n", VERSION);
 
-  initTimeStampStruct(&myTs);
+  initTimeStampStruct(&sincTs);
   initTimeStampStruct(&sendTs);
-  myTs = getTimeStampStructfromMillisec(1444444444444);
-  setRTCTime(myTs);
+  sincTs = getTimeStampStructfromMillisec(1444444444444);
+  setRTCTime(sincTs);
+  sinc = true;
 
   /* USER CODE END 2 */
 
@@ -335,14 +338,23 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
   //AppData->Port = LORAWAN_APP_PORT;
 
-  AppData->Port = 6;
+  if (packet_sinc)
+  {
+	  AppData->Port = 6;
+	  AppData->Buff[i++] = 's';
+	  AppData->Buff[i++] = 'i';
+	  AppData->Buff[i++] = 'n';
+	  AppData->Buff[i++] = 'c';
+  }
+  else
+  {
+	  AppData->Port = 1;
+	  AppData->Buff[i++] = 'f';
+	  AppData->Buff[i++] = 'o';
+	  AppData->Buff[i++] = 'o';
+  }
 
   *IsTxConfirmed =  LORAWAN_CONFIRMED_MSG;
-
-  AppData->Buff[i++] = 's';
-  AppData->Buff[i++] = 'i';
-  AppData->Buff[i++] = 'n';
-  AppData->Buff[i++] = 'c';
 
   AppData->BuffSize = i;
 
@@ -394,32 +406,50 @@ static void LoraRxData( lora_AppData_t *AppData )
 		  ts |= nl << s;
 		  s+=8;
 	  }
-	  myTs = getTimeStampStructfromMillisec(ts);
-	  PRINTF("Sinc time\r\n");
-	  printTime(myTs);
-	  sinc = true;
+	  sincTs = getTimeStampStructfromMillisec(ts);
+
+	  //sinc = true;
+
+	  uint64_t sinc_ts = getMicrosec(sincTs);
+	  uint64_t send_ts = getMicrosec(sendTs);
+
+	  struct TimeStampStruct nowTs = getRTCTime();
+	  uint64_t now_ts = getMicrosec(nowTs);
+	  uint64_t diff = 0;
+	  uint64_t new_ts = 0;
+	  if(now_ts >= send_ts)
+	  {
+		  diff = now_ts - send_ts;
+		  new_ts = sinc_ts + diff;
+	  }
+	  else
+	  {
+		  diff = send_ts - now_ts;
+		  new_ts = sinc_ts - diff;
+	  }
+	  struct TimeStampStruct newTs = getTimeStampStructfromMicrosec(new_ts);
 
 	if(sinc == true)
 	{
-	  uint64_t sinc_ts = getMicrosec(myTs);
-	  uint64_t send_ts = getMicrosec(sendTs);
-	  struct TimeStampStruct nowTs = getRTCTime();
-	  uint64_t now_ts = getMicrosec(nowTs);
-	  PRINTF("Now time\r\n");
-	  printTime(nowTs);
-	  uint32_t diff = now_ts - send_ts;
-	  PRINTF("diff = %d\r\n", diff);
-	  uint64_t new_ts = sinc_ts + diff;
-	  myTs = getTimeStampStructfromMicrosec(new_ts);
-	  setRTCTime(myTs);
-
-	  PRINTF("New time\r\n");
-	  printTime(myTs);
-	  sinc = false;
-
-	  //setAlarm(myTs.nowtm.tm_wday);
-
+		setRTCTime(newTs);
+		setAlarm();
+		PRINTF("---- SINC ---\r\n");
+//		sinc = false;
 	}
+	PRINTF("Sinc time\r\n");
+	printTime(sincTs);
+	PRINTF("Now time\r\n");
+	printTime(nowTs);
+	int diff2 = 0;
+	if(sinc_ts >= send_ts)
+		diff2 = sinc_ts - send_ts;
+	else
+		diff2 = - (send_ts - sinc_ts);
+	PRINTF("diff2 = %d\r\n", diff2);
+	uint32_t diff3 = diff;
+	PRINTF("diff = %d\r\n", diff3);
+	PRINTF("New time\r\n");
+	printTime(newTs);
 
     break;
   default:

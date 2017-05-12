@@ -74,7 +74,7 @@ Maintainer: Miguel Luis and Gregory Cristian
  * When set to 1 the application uses the Over-the-Air activation procedure
  * When set to 0 the application uses the Personalization activation procedure
  */
-#define OVER_THE_AIR_ACTIVATION                     1
+#define OVER_THE_AIR_ACTIVATION                     0
 
 /*!
  * Indicates if the end-device is to be connected to a private or public network
@@ -94,7 +94,7 @@ Maintainer: Miguel Luis and Gregory Cristian
  * \remark see STATIC_DEVICE_EUI comments
  */
 //#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06 }
-#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04 }
+#define LORAWAN_DEVICE_EUI                          { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x44 }
 
 /*!
  * Application IEEE EUI (big endian)
