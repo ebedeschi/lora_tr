@@ -3,11 +3,11 @@
 #include "stm32l4xx_hal.h"
 #include "vcom.h"
 
-#define MY_PRES_A		0x00		// max clock resolution
-#define MY_PRES_D		0x7FFF		// 32767 <- MAX_COUNT_PRESCALER_SINCRO - 1 = 32768 - 1 = 32767
-#define RES 			30.517578125	// (((long)1000000) / MY_PRES_D + 1) with MY_PRES_D = 0x7FFF
-#define FRACT_TO_MICROS	0.0002328306	// (1000000 / 2^32) -> micros = fraction * (1000000 / 2^32)
-#define MICROS_TO_FRACT	4294.967296		// (2^32 / 1000000) -> fraction = micros * (2^32 / 1000000)
+//#define MY_PRES_A		0x00		// max clock resolution
+//#define MY_PRES_D		0x7FFF		// 32767 <- MAX_COUNT_PRESCALER_SINCRO - 1 = 32768 - 1 = 32767
+//#define RES 			30.517578125	// (((long)1000000) / MY_PRES_D + 1) with MY_PRES_D = 0x7FFF
+//#define FRACT_TO_MICROS	0.0002328306	// (1000000 / 2^32) -> micros = fraction * (1000000 / 2^32)
+//#define MICROS_TO_FRACT	4294.967296		// (2^32 / 1000000) -> fraction = micros * (2^32 / 1000000)
 
 struct TimeStampStruct{
 	struct tm nowtm;	// data and time

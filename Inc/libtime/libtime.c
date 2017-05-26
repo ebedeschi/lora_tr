@@ -23,10 +23,8 @@ struct TimeStampStruct convertInTimeStampStruct(RTC_TimeTypeDef RTC_TimeStruct, 
 
 	//set subsecond
 	ts.tv.tv_sec = mktime(&ts.nowtm);
-	// RES = round(((long)1000000) / MY_PRES_D + 1) with MY_PRES_D = 0x7FFF
-	ts.tv.tv_usec = (suseconds_t) (((long)1000000) - (((double)RTC_TimeStruct.SubSeconds) * (double)RES));// + ((((long)1000000) - (((long)SubSecond) * RES)) * OFFSET);
-
-	//ts.tv.tv_usec += (suseconds_t)(((long double)ts.tv.tv_usec) * ((long double)0.000103988));
+	// RES = round((1000000) / PREDIV_S + 1) with PREDIV_S = 1023
+	ts.tv.tv_usec = (suseconds_t) (RTC_TimeStruct.SubSeconds * 977);
 
 	return ts;
 }
@@ -95,6 +93,7 @@ void setRTCTime(struct TimeStampStruct ts)
 	RTC_TimeStruct.Hours = ts.nowtm.tm_hour;
 	RTC_TimeStruct.Minutes = ts.nowtm.tm_min;
 	RTC_TimeStruct.Seconds = ts.nowtm.tm_sec;
+	RTC_TimeStruct.SubSeconds = (ts.tv.tv_usec / (977)); // [1 Sec / SecondFraction +1] with SecondFraction = PREDIV_S = 1023
 	RTC_TimeStruct.TimeFormat = ts.nowtm.tm_isdst;
 
 	// set

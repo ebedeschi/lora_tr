@@ -238,7 +238,7 @@ int main(void)
   /* USER CODE BEGIN 3 */
 
 //	TimerInit( &wakeup, OnWakeup );
-//	TimerSetValue( &wakeup, 10000 );
+//	TimerSetValue( &wakeup, 5000 );
 //	TimerStart( &wakeup );
 
 	DISABLE_IRQ( );
