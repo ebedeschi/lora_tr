@@ -52,7 +52,7 @@
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
  */
-#define APP_TX_DUTYCYCLE                            20000
+#define APP_TX_DUTYCYCLE                            10000
 /*!
  * LoRaWAN Adaptive Data Rate
  * @note Please note that when ADR is enabled the end-device should be static
@@ -85,12 +85,23 @@ uint8_t  error = 0;              //variable for error code. For codes see system
 
 struct TimeStampStruct sincTs;
 struct TimeStampStruct sendTs;
+struct TimeStampStruct newTs;
+struct TimeStampStruct second_sinc_ts;
+struct TimeStampStruct temp_ts;
 
-bool  sinc = true;
+uint8_t  sinc = 0;
 
 bool  packet_sinc = false;
 
+char Rx_indx_3, Rx_data_3[2], Rx_Buffer_3[100], Transfer_cplt_3, Tx_Buffer_3[100];
+
+struct TimeStampStruct uartTs;
+uint8_t  uart_sinc = 0;
+uint8_t  uart_sinc_main = 0;
+uint8_t  pause = 1;
+
 TimerEvent_t wakeup;
+TimerEvent_t setTimeTE;
 
 /* call back when LoRa will transmit a frame*/
 static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed);
@@ -139,6 +150,26 @@ static void OnWakeup( void )
     TimerStop( &wakeup );
 }
 
+static void OnSetTime( void )
+{
+    TimerStop( &setTimeTE );
+
+	temp_ts = getRTCTime();
+	PRINTF("Temp time\r\n");
+	printTime(temp_ts);
+
+	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
+
+	setRTCTime(newTs);
+//	setAlarm();
+	PRINTF("---- SINC ---\r\n");
+	second_sinc_ts = getRTCTime();
+	PRINTF("-- SECOND SINC --\r\n");
+	printTime(second_sinc_ts);
+	PRINTF("---------------\r\n");
+
+}
+
 /* USER CODE END 0 */
 
 int main(void)
@@ -161,7 +192,7 @@ int main(void)
   MX_GPIO_Init();
 //  MX_I2C1_Init();
 //  MX_SPI1_Init();
-//  MX_USART3_UART_Init();
+  MX_USART3_UART_Init();
   MX_RTC_Init();
 //  MX_ADC3_Init();
 
@@ -208,21 +239,29 @@ int main(void)
 
   hrtc = RtcHandle;
 
+  HAL_UART_Receive_IT(&huart3, Rx_data_3, 1);
+
 //  setAlarm(0);
 //  PRINTF("delay 10\n");
 //  HAL_Delay(10000); //delay
 
+  while(uart_sinc_main == 0)
+  {
+	  PRINTF("Wait uart sinc\r\n");
+	  HAL_Delay(1000); //delay
+  }
+  uart_sinc_main = 0;
+  HAL_Delay(5000); //delay
+
+//	initTimeStampStruct(&sincTs);
+//	initTimeStampStruct(&sendTs);
+//	sincTs = getTimeStampStructfromMillisec(1444444444444);
+//	setRTCTime(sincTs);
 
   /* Configure the Lora Stack*/
   lora_Init( &LoRaMainCallbacks, &LoRaParamInit);
 
   PRINTF("VERSION: %X\n", VERSION);
-
-  initTimeStampStruct(&sincTs);
-  initTimeStampStruct(&sendTs);
-  sincTs = getTimeStampStructfromMillisec(1444444444444);
-  setRTCTime(sincTs);
-  sinc = true;
 
   /* USER CODE END 2 */
 
@@ -417,44 +456,120 @@ static void LoraRxData( lora_AppData_t *AppData )
 	  uint64_t now_ts = getMicrosec(nowTs);
 	  uint64_t diff = 0;
 	  uint64_t new_ts = 0;
-	  if(now_ts >= send_ts)
-	  {
-		  diff = now_ts - send_ts;
-		  new_ts = sinc_ts + diff;
-	  }
-	  else
-	  {
-		  diff = send_ts - now_ts;
-		  new_ts = sinc_ts - diff;
-	  }
-	  struct TimeStampStruct newTs = getTimeStampStructfromMicrosec(new_ts);
+	  diff = now_ts - send_ts;
+	  new_ts = sinc_ts + diff;
+//	  if(now_ts >= send_ts)
+//	  {
+//		  diff = now_ts - send_ts;
+//		  new_ts = sinc_ts + diff;
+//	  }
+//	  else
+//	  {
+//		  diff = send_ts - now_ts;
+//		  new_ts = sinc_ts - diff;
+//	  }
+	 newTs = getTimeStampStructfromMicrosec(new_ts);
 
-	if(sinc == true)
-	{
+//		PRINTF("New time prima\r\n");
+//		printTime(newTs);
+
+//	if(sinc == true)
+//	{
+		uint32_t fra = (1000000 - newTs.tv.tv_usec)/1000;
+		newTs.tv.tv_sec = newTs.tv.tv_sec + 1;
+		newTs.tv.tv_usec = 0;
+		extendTimeStampStruct(&newTs);
+
+		sinc = 1;
+
+//		TimerInit( &setTimeTE, OnSetTime );
+//		TimerSetValue( &setTimeTE, fra );
+//		TimerStart( &setTimeTE );
+		PRINTF("fra %d\r\n", fra);
+		HAL_Delay(fra);
 		setRTCTime(newTs);
-		setAlarm();
-		PRINTF("---- SINC ---\r\n");
+		temp_ts = getRTCTime();
+		PRINTF("Temp time\r\n");
+		printTime(temp_ts);
+//		setAlarm();
+//		PRINTF("---- SINC ---\r\n");
 //		sinc = false;
-	}
+//	}
+
 	PRINTF("Sinc time\r\n");
 	printTime(sincTs);
 	PRINTF("Now time\r\n");
 	printTime(nowTs);
 	int diff2 = 0;
-	if(sinc_ts >= send_ts)
+//	if(sinc_ts >= send_ts)
 		diff2 = sinc_ts - send_ts;
-	else
-		diff2 = - (send_ts - sinc_ts);
-	PRINTF("diff2 = %d\r\n", diff2);
-	uint32_t diff3 = diff;
-	PRINTF("diff = %d\r\n", diff3);
-	PRINTF("New time\r\n");
+//	else
+//		diff2 = - (send_ts - sinc_ts);
+	PRINTF("diff2 = %d\r\n", (int)diff2);
+	PRINTF("diff = %d\r\n", (int)diff);
+	PRINTF("New time dopo\r\n");
 	printTime(newTs);
+//	pause = 1;
 
     break;
   default:
     break;
   }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+
+//	if (huart->Instance == USART1)	//current UART
+//	{
+//		Rx_Buffer_1[Rx_indx_1++]=Rx_data_1[0];	//add data to Rx_Buffer
+//
+//		if (Rx_data_1[0]==10)			//if received data = 13
+//		{
+//			Rx_Buffer_1[Rx_indx_1]='\0';
+//			Rx_indx_1=0;
+//			Transfer_cplt_1=1;//transfer complete, data is ready to read
+//
+//			int n = sprintf(Tx_Buffer_1, "%s", Rx_Buffer_1);
+//			//HAL_UART_Transmit(&huart1, (uint8_t*) &Tx_Buffer_1, n, 1000);
+//			HAL_UART_Transmit(&huart3, (uint8_t*) &Tx_Buffer_1, n, 1000);
+//		}
+//
+//		HAL_UART_Receive_IT(&huart1, Rx_data_1, 1);	//activate UART receive interrupt every time
+//	}
+//	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+
+	if (huart->Instance == USART3)	//current UART
+	{
+		Rx_Buffer_3[Rx_indx_3++] = Rx_data_3[0];	//add data to Rx_Buffer
+
+		if (Rx_data_3[0] == 10)			//if received data = 13
+		{
+			Rx_Buffer_3[Rx_indx_3] = '\0';
+			Rx_indx_3 = 0;
+			Transfer_cplt_3 = 1;	//transfer complete, data is ready to read
+
+			int n = sprintf(Tx_Buffer_3, "%s", Rx_Buffer_3);
+			HAL_UART_Transmit(&huart3, (uint8_t*) &Tx_Buffer_3, n, 1000);
+
+			  unsigned long long ts = 0;
+			  unsigned long long nl=0;
+			  unsigned long long s = 1;
+			  char *ptr;
+
+			  for(int i=(n-2); i>=0; i--)
+			  {
+				  nl = (uint8_t)(Tx_Buffer_3[i] - '0');
+				  ts += nl * s;
+				  s*=10;
+			  }
+			  uartTs = getTimeStampStructfromMillisec((uint64_t)ts);
+			  printTime(uartTs);
+			  uart_sinc = 1;
+//			  pause=0;
+		}
+
+		HAL_UART_Receive_IT(&huart3, Rx_data_3, 1);	//activate UART receive interrupt every time
+	}
 }
 
 /* USER CODE END 4 */

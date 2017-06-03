@@ -65,6 +65,8 @@
 #define RADIO_MOSI_GPIO_Port GPIOA
 #define OUT_PULSE_Pin GPIO_PIN_0
 #define OUT_PULSE_GPIO_Port GPIOB
+#define PPS_Pin GPIO_PIN_1
+#define PPS_GPIO_Port GPIOB
 #define RADIO_NRESET_Pin GPIO_PIN_12
 #define RADIO_NRESET_GPIO_Port GPIOB
 #define RFPOWER_Pin GPIO_PIN_13

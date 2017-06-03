@@ -36,7 +36,7 @@
 #include "rtc.h"
 
 /* USER CODE BEGIN 0 */
-
+#include "libtime/libtime.h"
 /* USER CODE END 0 */
 
 RTC_HandleTypeDef hrtc;
@@ -76,7 +76,7 @@ void MX_RTC_Init(void)
   sDate.WeekDay = RTC_WEEKDAY_SUNDAY;
   sDate.Month = RTC_MONTH_JANUARY;
   sDate.Date = 0x1;
-  sDate.Year = 0x7;
+  sDate.Year = 0x17;
 
   if (HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BCD) != HAL_OK)
   {
@@ -103,7 +103,7 @@ void MX_RTC_Init(void)
 
     /**Enable the Alarm B 
     */
-  sAlarm.AlarmMask = RTC_ALARMMASK_NONE;
+  sAlarm.AlarmMask = RTC_ALARMMASK_ALL;
   sAlarm.AlarmDateWeekDay = 0x1;
   sAlarm.Alarm = RTC_ALARM_B;
   if (HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BCD) != HAL_OK)
@@ -197,10 +197,30 @@ void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
   TimerIrqHandler( );
 }
 
+struct TimeStampStruct pulse_ts;
+struct TimeStampStruct second_sinc_ts;
+extern uint8_t sinc;
+extern struct TimeStampStruct newTs;
+
 void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
 {
 	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
-	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+//	if(sinc==1)
+//	{
+//		setRTCTime(newTs);
+//		setAlarm();
+//		PRINTF("---- SINC ---\r\n");
+//		second_sinc_ts = getRTCTime();
+//		PRINTF("-- SECOND SINC --\r\n");
+//		printTime(second_sinc_ts);
+//		PRINTF("---------------\r\n");
+//		sinc = 0;
+//	}
+//	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+//	pulse_ts = getRTCTime();
+//	PRINTF("---- pulse ---\r\n");
+//	printTime(pulse_ts);
+//	PRINTF("---------------\r\n");
 }
 
 void setAlarm()

@@ -9,6 +9,9 @@ uint8_t shift_add = 0;
 struct TimeStampStruct convertInTimeStampStruct(RTC_TimeTypeDef RTC_TimeStruct, RTC_DateTypeDef RTC_DateStruct)
 {
 	struct TimeStampStruct ts;
+
+	initTimeStampStruct(&ts);
+
 	// set Date
 	ts.nowtm.tm_year = RTC_DateStruct.Year;
 	ts.nowtm.tm_mon = RTC_DateStruct.Month;
@@ -24,7 +27,9 @@ struct TimeStampStruct convertInTimeStampStruct(RTC_TimeTypeDef RTC_TimeStruct, 
 	//set subsecond
 	ts.tv.tv_sec = mktime(&ts.nowtm);
 	// RES = round((1000000) / PREDIV_S + 1) with PREDIV_S = 1023
-	ts.tv.tv_usec = (suseconds_t) (RTC_TimeStruct.SubSeconds * 977);
+	//ts.tv.tv_usec = (suseconds_t) ( 1000000 - ( (long)RTC_TimeStruct.SubSeconds * 977 ) );
+	//Second fraction ratio * time_unit= [(SecondFraction-SubSeconds)/(SecondFraction+1)] * time_unit
+	ts.tv.tv_usec = (suseconds_t) ( ((1023 - RTC_TimeStruct.SubSeconds)*977));
 
 	return ts;
 }
@@ -93,8 +98,10 @@ void setRTCTime(struct TimeStampStruct ts)
 	RTC_TimeStruct.Hours = ts.nowtm.tm_hour;
 	RTC_TimeStruct.Minutes = ts.nowtm.tm_min;
 	RTC_TimeStruct.Seconds = ts.nowtm.tm_sec;
-	RTC_TimeStruct.SubSeconds = (ts.tv.tv_usec / (977)); // [1 Sec / SecondFraction +1] with SecondFraction = PREDIV_S = 1023
+//	RTC_TimeStruct.SubSeconds = (ts.tv.tv_usec / (977)); // [1 Sec / SecondFraction +1] with SecondFraction = PREDIV_S = 1023
 	RTC_TimeStruct.TimeFormat = ts.nowtm.tm_isdst;
+
+//	RTC_TimeStruct.StoreOperation = RTC_STOREOPERATION_RESET;
 
 	// set
 	HAL_RTC_SetTime(&hrtc, &RTC_TimeStruct, RTC_FORMAT_BIN);
@@ -121,6 +128,8 @@ struct TimeStampStruct getTimeStampStructfromMicrosec(uint64_t microsecond)
 struct TimeStampStruct getTimeStampStructfromMillisec(uint64_t millisecond)
 {
 	struct TimeStampStruct ts;
+
+	initTimeStampStruct(&ts);
 
 	ts.tv.tv_sec = millisecond / 1000;
 	ts.tv.tv_usec = ( millisecond % 1000 ) * 1000;
@@ -163,7 +172,7 @@ void printTime(struct TimeStampStruct ts)
 //	t_of_day = mktime(&ts.nowtm);
 //	PRINTF("seconds since the Epoch: %ld\n", (long) t_of_day);
 
-	PRINTF("microsec: %ld%ld\n", (long)(ts.tv.tv_sec), (long)(ts.tv.tv_usec));
+	PRINTF("microsec: %ld %ld\n", (long)(ts.tv.tv_sec), (long)(ts.tv.tv_usec));
 
 }
 

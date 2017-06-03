@@ -58,6 +58,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include <string.h>
 
 extern bool  packet_sinc;
+extern uint8_t  pause;
 /*
  * Local types definition
  */
@@ -1639,11 +1640,12 @@ void SX1276OnDio0Irq( void )
                 SX1276.Settings.State = RF_IDLE;
                 if( ( RadioEvents != NULL ) && ( RadioEvents->TxDone != NULL ) )
                 {
-                	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
-                	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
                 	if(packet_sinc == true)
                 		sendTs = getRTCTime();
-                   RadioEvents->TxDone( );
+                	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
+                	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+                   //pause=0;
+                	RadioEvents->TxDone( );
                    if(packet_sinc == true)
                    {
 					   PRINTF("txDone\n");
