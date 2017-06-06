@@ -104,8 +104,8 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = PPS_Pin|RADIO_DIO0_Pin|RADIO_DIO1_Pin;
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
+  GPIO_InitStruct.Pin = PPS_Pin|gwrx_Pin|RADIO_DIO0_Pin|RADIO_DIO1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -119,6 +119,9 @@ void MX_GPIO_Init(void)
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
@@ -135,6 +138,7 @@ extern uint8_t  uart_sinc;
 extern uint8_t  uart_sinc_main;
 extern uint8_t  pause;
 struct TimeStampStruct second_ts;
+struct TimeStampStruct gwrx_ts;
 /**
   * @brief  EXTI line detection callbacks.
   * @param  GPIO_Pin: Specifies the pins connected to the EXTI line.
@@ -164,6 +168,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //			printTime(second_ts);
 //			PRINTF("---------------\r\n");
 //		}
+	}
+	if(GPIO_Pin == GPIO_PIN_2)
+	{
+		gwrx_ts = getRTCTime();
+		PRINTF("---- gwrx_ts ---\r\n");
+		printTime(gwrx_ts);
+		PRINTF("---------------\r\n");
 	}
 
 	HW_GPIO_IrqHandler( GPIO_Pin );

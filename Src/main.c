@@ -190,11 +190,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-//  MX_I2C1_Init();
-//  MX_SPI1_Init();
+  MX_I2C1_Init();
+  MX_SPI1_Init();
   MX_USART3_UART_Init();
   MX_RTC_Init();
-//  MX_ADC3_Init();
+  MX_ADC3_Init();
+//  SystemClock_Config();
 
   /* USER CODE BEGIN 2 */
 
@@ -245,13 +246,13 @@ int main(void)
 //  PRINTF("delay 10\n");
 //  HAL_Delay(10000); //delay
 
-  while(uart_sinc_main == 0)
-  {
-	  PRINTF("Wait uart sinc\r\n");
-	  HAL_Delay(1000); //delay
-  }
-  uart_sinc_main = 0;
-  HAL_Delay(5000); //delay
+//  while(uart_sinc_main == 0)
+//  {
+//	  PRINTF("Wait uart sinc\r\n");
+//	  HAL_Delay(1000); //delay
+//  }
+//  uart_sinc_main = 0;
+//  HAL_Delay(5000); //delay
 
 //	initTimeStampStruct(&sincTs);
 //	initTimeStampStruct(&sendTs);
@@ -481,6 +482,8 @@ static void LoraRxData( lora_AppData_t *AppData )
 		extendTimeStampStruct(&newTs);
 
 		sinc = 1;
+
+		fra -= 8;
 
 //		TimerInit( &setTimeTE, OnSetTime );
 //		TimerSetValue( &setTimeTE, fra );

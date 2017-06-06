@@ -67,6 +67,8 @@
 #define OUT_PULSE_GPIO_Port GPIOB
 #define PPS_Pin GPIO_PIN_1
 #define PPS_GPIO_Port GPIOB
+#define gwrx_Pin GPIO_PIN_2
+#define gwrx_GPIO_Port GPIOB
 #define RADIO_NRESET_Pin GPIO_PIN_12
 #define RADIO_NRESET_GPIO_Port GPIOB
 #define RFPOWER_Pin GPIO_PIN_13
