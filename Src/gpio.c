@@ -169,13 +169,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //			PRINTF("---------------\r\n");
 //		}
 	}
-	if(GPIO_Pin == GPIO_PIN_2)
-	{
-		gwrx_ts = getRTCTime();
-		PRINTF("---- gwrx_ts ---\r\n");
-		printTime(gwrx_ts);
-		PRINTF("---------------\r\n");
-	}
+//	if(GPIO_Pin == GPIO_PIN_2)
+//	{
+//		gwrx_ts = getRTCTime();
+//		PRINTF("---- gwrx_ts ---\r\n");
+//		printTime(gwrx_ts);
+//		PRINTF("---------------\r\n");
+//	}
 
 	HW_GPIO_IrqHandler( GPIO_Pin );
 }

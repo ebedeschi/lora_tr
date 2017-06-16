@@ -377,7 +377,7 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
   batteryLevel = HW_GetBatteryLevel( );                     /* 1 (very low) to 254 (fully charged) */
 
   //AppData->Port = LORAWAN_APP_PORT;
-
+//  packet_sinc = true;
   if (packet_sinc)
   {
 	  AppData->Port = 6;
