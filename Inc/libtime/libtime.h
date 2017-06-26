@@ -1,3 +1,7 @@
+
+#ifndef LIBTIME_LIBTIME_H_
+#define LIBTIME_LIBTIME_H_
+
 #include "sys/time.h"
 #include "time.h"
 #include "stm32l4xx_hal.h"
@@ -39,3 +43,4 @@ struct TimeStampStruct getTimeStampStructfromMicrosec(uint64_t microsecond);
 
 struct TimeStampStruct getTimeStampStructfromMillisec(uint64_t millisecond);
 
+#endif

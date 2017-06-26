@@ -111,7 +111,7 @@ static uint8_t AppSKey[] = LORAWAN_APPSKEY;
 static uint32_t DevAddr = LORAWAN_DEVICE_ADDRESS;
 
 #endif
-extern bool packet_sinc;
+
 /*!
  * User application data buffer size
  */
@@ -655,7 +655,7 @@ void lora_fsm( void)
     {
       PRINTF("JOINED\n");
       DeviceState = DEVICE_STATE_SEND;
-      packet_sinc = true;
+      setPacketSinc(true);
       break;
     }
     case DEVICE_STATE_SEND:
@@ -665,7 +665,7 @@ void lora_fsm( void)
           PrepareTxFrame( );
           NextTx = SendFrame( );
       }
-      if (packet_sinc == false)
+      if (getPacketSinc() == false)
       {
 		  PRINTF("---------------down----------------\n");
 		  HAL_Delay(10000);

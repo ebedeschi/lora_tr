@@ -57,8 +57,6 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "sx1276mb1mas.h"
 #include <string.h>
 
-extern bool  packet_sinc;
-extern uint8_t  pause;
 /*
  * Local types definition
  */
@@ -1640,19 +1638,21 @@ void SX1276OnDio0Irq( void )
                 SX1276.Settings.State = RF_IDLE;
                 if( ( RadioEvents != NULL ) && ( RadioEvents->TxDone != NULL ) )
                 {
-                	if(packet_sinc == true)
-                		sendTs = getRTCTime();
-                	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
-                	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
+
+//                	if(getPacketSinc() == true)
+//                		sendTs = getRTCTime();
+//                	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
+//                	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
                    //pause=0;
                 	RadioEvents->TxDone( );
-                   if(packet_sinc == true)
-                   {
-					   PRINTF("txDone\n");
-					   PRINTF("Send time\r\n");
-					   printTime(sendTs);
-                   }
-                   packet_sinc=!packet_sinc;
+//                   if(getPacketSinc() == true)
+//                   {
+//					   PRINTF("txDone\n");
+//					   PRINTF("Send time\r\n");
+//					   printTime(sendTs);
+//                   }
+//                   setPacketSinc(!getPacketSinc());
+                	setSendTime();
                 }
                 break;
             }

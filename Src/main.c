@@ -48,6 +48,8 @@
 #include "vcom.h"
 #include "version.h"
 #include "libtime/libtime.h"
+#include "libsinc/libsinc.h"
+
 
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
@@ -90,8 +92,6 @@ struct TimeStampStruct second_sinc_ts;
 struct TimeStampStruct temp_ts;
 
 uint8_t  sinc = 0;
-
-bool  packet_sinc = false;
 
 char Rx_indx_3, Rx_data_3[2], Rx_Buffer_3[100], Transfer_cplt_3, Tx_Buffer_3[100];
 
@@ -378,7 +378,7 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
   //AppData->Port = LORAWAN_APP_PORT;
 //  packet_sinc = true;
-  if (packet_sinc)
+  if (getPacketSinc())
   {
 	  AppData->Port = 6;
 	  AppData->Buff[i++] = 's';
@@ -440,79 +440,80 @@ static void LoraRxData( lora_AppData_t *AppData )
 		  PRINTF("%c", (char)(AppData->Buff[i]));
     break;
   case 6:
-	  for(int i=(AppData->BuffSize-1); i>=0; i--)
-	  {
-		  nl = (AppData->Buff[i]);
-		  ts |= nl << s;
-		  s+=8;
-	  }
-	  sincTs = getTimeStampStructfromMillisec(ts);
-
-	  //sinc = true;
-
-	  uint64_t sinc_ts = getMicrosec(sincTs);
-	  uint64_t send_ts = getMicrosec(sendTs);
-
-	  struct TimeStampStruct nowTs = getRTCTime();
-	  uint64_t now_ts = getMicrosec(nowTs);
-	  uint64_t diff = 0;
-	  uint64_t new_ts = 0;
-	  diff = now_ts - send_ts;
-	  new_ts = sinc_ts + diff;
-//	  if(now_ts >= send_ts)
+	  sincRTC( getTimeStampFromBuffer(AppData->Buff, AppData->BuffSize) );
+//	  for(int i=(AppData->BuffSize-1); i>=0; i--)
 //	  {
-//		  diff = now_ts - send_ts;
-//		  new_ts = sinc_ts + diff;
+//		  nl = (AppData->Buff[i]);
+//		  ts |= nl << s;
+//		  s+=8;
 //	  }
-//	  else
-//	  {
-//		  diff = send_ts - now_ts;
-//		  new_ts = sinc_ts - diff;
-//	  }
-	 newTs = getTimeStampStructfromMicrosec(new_ts);
+//	  sincTs = getTimeStampStructfromMillisec(ts);
 
-//		PRINTF("New time prima\r\n");
-//		printTime(newTs);
-
-//	if(sinc == true)
-//	{
-		uint32_t fra = (1000000 - newTs.tv.tv_usec)/1000;
-		newTs.tv.tv_sec = newTs.tv.tv_sec + 1;
-		newTs.tv.tv_usec = 0;
-		extendTimeStampStruct(&newTs);
-
-		sinc = 1;
-
-		fra -= 8;
-
-//		TimerInit( &setTimeTE, OnSetTime );
-//		TimerSetValue( &setTimeTE, fra );
-//		TimerStart( &setTimeTE );
-		PRINTF("fra %d\r\n", fra);
-		HAL_Delay(fra);
-		setRTCTime(newTs);
-		temp_ts = getRTCTime();
-		PRINTF("Temp time\r\n");
-		printTime(temp_ts);
-//		setAlarm();
-//		PRINTF("---- SINC ---\r\n");
-//		sinc = false;
-//	}
-
-	PRINTF("Sinc time\r\n");
-	printTime(sincTs);
-	PRINTF("Now time\r\n");
-	printTime(nowTs);
-	int diff2 = 0;
-//	if(sinc_ts >= send_ts)
-		diff2 = sinc_ts - send_ts;
-//	else
-//		diff2 = - (send_ts - sinc_ts);
-	PRINTF("diff2 = %d\r\n", (int)diff2);
-	PRINTF("diff = %d\r\n", (int)diff);
-	PRINTF("New time dopo\r\n");
-	printTime(newTs);
-//	pause = 1;
+//	  //sinc = true;
+//
+//	  uint64_t sinc_ts = getMicrosec(sincTs);
+//	  uint64_t send_ts = getMicrosec(getSendTs());
+//
+//	  struct TimeStampStruct nowTs = getRTCTime();
+//	  uint64_t now_ts = getMicrosec(nowTs);
+//	  uint64_t diff = 0;
+//	  uint64_t new_ts = 0;
+//	  diff = now_ts - send_ts;
+//	  new_ts = sinc_ts + diff;
+////	  if(now_ts >= send_ts)
+////	  {
+////		  diff = now_ts - send_ts;
+////		  new_ts = sinc_ts + diff;
+////	  }
+////	  else
+////	  {
+////		  diff = send_ts - now_ts;
+////		  new_ts = sinc_ts - diff;
+////	  }
+//	 newTs = getTimeStampStructfromMicrosec(new_ts);
+//
+////		PRINTF("New time prima\r\n");
+////		printTime(newTs);
+//
+////	if(sinc == true)
+////	{
+//		uint32_t fra = (1000000 - newTs.tv.tv_usec)/1000;
+//		newTs.tv.tv_sec = newTs.tv.tv_sec + 1;
+//		newTs.tv.tv_usec = 0;
+//		extendTimeStampStruct(&newTs);
+//
+//		sinc = 1;
+//
+//		fra -= 8;
+//
+////		TimerInit( &setTimeTE, OnSetTime );
+////		TimerSetValue( &setTimeTE, fra );
+////		TimerStart( &setTimeTE );
+//		PRINTF("fra %d\r\n", fra);
+//		HAL_Delay(fra);
+//		setRTCTime(newTs);
+//		temp_ts = getRTCTime();
+//		PRINTF("Temp time\r\n");
+//		printTime(temp_ts);
+////		setAlarm();
+////		PRINTF("---- SINC ---\r\n");
+////		sinc = false;
+////	}
+//
+//	PRINTF("Sinc time\r\n");
+//	printTime(sincTs);
+//	PRINTF("Now time\r\n");
+//	printTime(nowTs);
+//	int diff2 = 0;
+////	if(sinc_ts >= send_ts)
+//		diff2 = sinc_ts - send_ts;
+////	else
+////		diff2 = - (send_ts - sinc_ts);
+//	PRINTF("diff2 = %d\r\n", (int)diff2);
+//	PRINTF("diff = %d\r\n", (int)diff);
+//	PRINTF("New time dopo\r\n");
+//	printTime(newTs);
+////	pause = 1;
 
     break;
   default:
