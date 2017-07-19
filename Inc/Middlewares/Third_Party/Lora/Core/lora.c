@@ -665,10 +665,10 @@ void lora_fsm( void)
           PrepareTxFrame( );
           NextTx = SendFrame( );
       }
-      if (getPacketSinc() == false)
-      {
-		  PRINTF("---------------down----------------\n");
-		  HAL_Delay(10000);
+//      if (getPacketSinc() == false)
+//      {
+//		  PRINTF("---------------down----------------\n");
+//		  HAL_Delay(10000);
 		  if( ComplianceTest.Running == true )
 		  {
 			  // Schedule next packet transmission as soon as possible
@@ -681,14 +681,14 @@ void lora_fsm( void)
 			  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
 			  TimerStart( &TxNextPacketTimer );
 		  }
-      }
-      else
-      {
-		  PRINTF("---------------sinc----------------\n");
-		  // Schedule next packet transmission as soon as possible
-		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
-		  TimerStart( &TxNextPacketTimer );
-      }
+//      }
+//      else
+//      {
+//		  PRINTF("---------------sinc----------------\n");
+//		  // Schedule next packet transmission as soon as possible
+//		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
+//		  TimerStart( &TxNextPacketTimer );
+//      }
 
 
       DeviceState = DEVICE_STATE_SLEEP;

@@ -378,25 +378,25 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
   //AppData->Port = LORAWAN_APP_PORT;
 //  packet_sinc = true;
-  if (getPacketSinc())
-  {
-	  AppData->Port = 6;
-	  AppData->Buff[i++] = 's';
-	  AppData->Buff[i++] = 'i';
-	  AppData->Buff[i++] = 'n';
-	  AppData->Buff[i++] = 'c';
-  }
-  else
-  {
-	  AppData->Port = 1;
-	  AppData->Buff[i++] = 'f';
-	  AppData->Buff[i++] = 'o';
-	  AppData->Buff[i++] = 'o';
-  }
+//  if (getPacketSinc())
+//  {
+//	  AppData->Port = 6;
+//	  AppData->Buff[i++] = 's';
+//	  AppData->Buff[i++] = 'i';
+//	  AppData->Buff[i++] = 'n';
+//	  AppData->Buff[i++] = 'c';
+//  }
+//  else
+//  {
+//	  AppData->Port = 1;
+//	  AppData->Buff[i++] = 'f';
+//	  AppData->Buff[i++] = 'o';
+//	  AppData->Buff[i++] = 'o';
+//  }
 
   *IsTxConfirmed =  LORAWAN_CONFIRMED_MSG;
 
-  AppData->BuffSize = i;
+//  AppData->BuffSize = i;
 
 //	char word[20];
 //	error |= SHT2x_MeasureHM(TEMP, &sT);
@@ -411,8 +411,22 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 ////	PRINTF("%s\n", Buffer);
 //	strcpy(AppData->Buff, word);
 //	PRINTF("%s\n", AppData->Buff);
-
+//
 //  AppData->BuffSize = strlen(AppData->Buff);
+
+	uint16_t sT, sH;
+	float   temperatureC, humidityH;           //variable for temperature[°C] as float
+	uint8_t  error = 0;              //variable for error code. For codes see system.h
+	error |= SHT2x_MeasureHM(TEMP, &sT);
+	temperatureC = SHT2x_CalcTemperatureC(sT);
+	error |= SHT2x_MeasureHM(HUMIDITY, &sH);
+	humidityH = SHT2x_CalcRH(sH);
+
+	memcpy(&AppData->Buff[0], &temperatureC, 4);
+	memcpy(&AppData->Buff[4], &humidityH, 4);
+
+	AppData->BuffSize = 8;
+	AppData->Port = 1;
 
 //  AppData->Buff[i++] = 'c';
 //  AppData->Buff[i++] = 'i';

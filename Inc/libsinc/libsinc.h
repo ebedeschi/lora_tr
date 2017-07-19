@@ -11,6 +11,14 @@
 #include <stdbool.h>
 #include "libtime/libtime.h"
 
+struct SincStatus{
+	bool _packet_sinc;
+	bool _send;
+	bool _receive;
+	uint8_t _seed;
+	uint8_t _timeout;
+};
+
 void sincRTC(struct TimeStampStruct );
 
 struct TimeStampStruct getTimeStampFromBuffer(uint8_t* , uint8_t );

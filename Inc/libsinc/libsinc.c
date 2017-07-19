@@ -26,6 +26,8 @@ struct TimeStampStruct _tempTs;
 
 bool _packet_sinc = false;
 
+struct SincStatus _sincStatus;
+
 void sincRTC(struct TimeStampStruct sincTs)
 {
 	_sincTs = sincTs;
