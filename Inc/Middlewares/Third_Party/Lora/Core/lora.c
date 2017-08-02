@@ -63,6 +63,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "timeServer.h"
 #include "LoRaMac.h"
 #include "lora.h"
+#include "temp/temp.h"
 
 /*!
  * Join requests trials duty cycle.
@@ -115,7 +116,7 @@ static uint32_t DevAddr = LORAWAN_DEVICE_ADDRESS;
 /*!
  * User application data buffer size
  */
-#define LORAWAN_APP_DATA_BUFF_SIZE                           64
+#define LORAWAN_APP_DATA_BUFF_SIZE                           241//64
 
 /*!
  * User application data
@@ -660,11 +661,17 @@ void lora_fsm( void)
     }
     case DEVICE_STATE_SEND:
     {
-      if( NextTx == true )
-      {
-          PrepareTxFrame( );
-          NextTx = SendFrame( );
-      }
+		if(checkExtract()==1)
+		{
+			PRINTF("check 1\r\n");
+			if( NextTx == true )
+			{
+			  PrepareTxFrame( );
+			  NextTx = SendFrame( );
+			}
+		}
+		else
+			PRINTF("check 0\r\n");
 //      if (getPacketSinc() == false)
 //      {
 //		  PRINTF("---------------down----------------\n");
@@ -672,7 +679,7 @@ void lora_fsm( void)
 		  if( ComplianceTest.Running == true )
 		  {
 			  // Schedule next packet transmission as soon as possible
-			  TimerSetValue( &TxNextPacketTimer,  30000); /* 5s */
+			  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
 			  TimerStart( &TxNextPacketTimer );
 		  }
 		  else if (LoRaParam->TxEvent == TX_ON_TIMER )

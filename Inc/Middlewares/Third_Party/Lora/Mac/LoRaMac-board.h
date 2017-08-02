@@ -354,7 +354,7 @@ Maintainer: Miguel Luis and Gregory Cristian
 /*!
  * Default datarate used by the node
  */
-#define LORAMAC_DEFAULT_DATARATE                    DR_0
+#define LORAMAC_DEFAULT_DATARATE                    DR_5//DR_0
 
 /*!
  * Minimal Rx1 receive datarate offset

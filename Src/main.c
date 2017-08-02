@@ -49,12 +49,13 @@
 #include "version.h"
 #include "libtime/libtime.h"
 #include "libsinc/libsinc.h"
+#include "temp/temp.h"
 
 
 /*!
  * Defines the application data transmission duty cycle. 5s, value in [ms].
  */
-#define APP_TX_DUTYCYCLE                            10000
+#define APP_TX_DUTYCYCLE                            20000
 /*!
  * LoRaWAN Adaptive Data Rate
  * @note Please note that when ADR is enabled the end-device should be static
@@ -264,6 +265,9 @@ int main(void)
 
   PRINTF("VERSION: %X\n", VERSION);
 
+  struct TimeStampStruct cts = getTimeStampStructfromMillisec(1501671314440);
+  setRTCTime(cts);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -289,6 +293,16 @@ int main(void)
 	ENABLE_IRQ();
 
 //	  PRINTF("Hello %d\r\n", c++);
+//	  //if(c%10==0)
+//	    printStat();
+//	    struct TempStruct ele;
+//	  if(c%15==0)
+//	  {
+//		  ele = extract();
+//			PRINTF("Quanti %d\r\n", ele.ct);
+//			struct TimeStampStruct ts =  ele.t;
+//			printTime(ts);
+//	  }
 //	  HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 //	  HAL_Delay(1000); //delay
   }
@@ -414,19 +428,19 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 //
 //  AppData->BuffSize = strlen(AppData->Buff);
 
-	uint16_t sT, sH;
-	float   temperatureC, humidityH;           //variable for temperature[°C] as float
-	uint8_t  error = 0;              //variable for error code. For codes see system.h
-	error |= SHT2x_MeasureHM(TEMP, &sT);
-	temperatureC = SHT2x_CalcTemperatureC(sT);
-	error |= SHT2x_MeasureHM(HUMIDITY, &sH);
-	humidityH = SHT2x_CalcRH(sH);
-
-	memcpy(&AppData->Buff[0], &temperatureC, 4);
-	memcpy(&AppData->Buff[4], &humidityH, 4);
-
-	AppData->BuffSize = 8;
-	AppData->Port = 1;
+//	uint16_t sT, sH;
+//	float   temperatureC, humidityH;           //variable for temperature[°C] as float
+//	uint8_t  error = 0;              //variable for error code. For codes see system.h
+//	error |= SHT2x_MeasureHM(TEMP, &sT);
+//	temperatureC = SHT2x_CalcTemperatureC(sT);
+//	error |= SHT2x_MeasureHM(HUMIDITY, &sH);
+//	humidityH = SHT2x_CalcRH(sH);
+//
+//	memcpy(&AppData->Buff[0], &temperatureC, 4);
+//	memcpy(&AppData->Buff[4], &humidityH, 4);
+//
+//	AppData->BuffSize = 8;
+//	AppData->Port = 1;
 
 //  AppData->Buff[i++] = 'c';
 //  AppData->Buff[i++] = 'i';
@@ -439,6 +453,33 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 //  AppData->Buff[i++] = 'd';
 //  AppData->Buff[i++] = 'o';
 
+
+
+     struct TempStruct ele;
+     uint64_t t_ms = 0;
+  	 if(checkExtract()==1)
+  	 {
+  		ele = extract();
+
+		PRINTF("Quanti %d\r\n", ele.ct);
+		struct TimeStampStruct ts =  ele.t;
+		printTime(ts);
+
+  		memcpy(&(AppData->Buff[0]), &(ele.ct), 2);
+  		t_ms = getMillisec(ele.t);
+  		memcpy(&(AppData->Buff[2]), &t_ms, 8);
+  		i = 2 + 8;
+  		for(int k=0;k<ele.ct;k++)
+  		{
+  			memcpy(&(AppData->Buff[i]), &((ele.temp[k])), 4);
+  			i+=4;
+  		}
+
+  	 }
+	 AppData->BuffSize = i;
+	 AppData->Port = 1;
+
+	 PRINTF("Send ele\r\n");
 
 }
 

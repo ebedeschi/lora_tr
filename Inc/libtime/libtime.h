@@ -39,6 +39,8 @@ void printRTC();
 
 uint64_t getMicrosec(struct TimeStampStruct ts);
 
+uint64_t getMillisec(struct TimeStampStruct ts);
+
 struct TimeStampStruct getTimeStampStructfromMicrosec(uint64_t microsecond);
 
 struct TimeStampStruct getTimeStampStructfromMillisec(uint64_t millisecond);
