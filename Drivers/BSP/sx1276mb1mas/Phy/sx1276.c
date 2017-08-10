@@ -56,6 +56,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "sx1276.h"
 #include "sx1276mb1mas.h"
 #include <string.h>
+#include "libsinc/libsinc.h"
 
 /*
  * Local types definition
@@ -1616,7 +1617,22 @@ void SX1276OnDio0Irq( void )
                     if( ( RadioEvents != NULL ) && ( RadioEvents->RxDone != NULL ) )
                     {
                         RadioEvents->RxDone( RxTxBuffer, SX1276.Settings.LoRaPacketHandler.Size, SX1276.Settings.LoRaPacketHandler.RssiValue, SX1276.Settings.LoRaPacketHandler.SnrValue );
-                        PRINTF("rxDone\n");
+                        PRINTF("RxDone\n");
+                        struct SincStatus status = getStatus();
+
+                      	if(status._packet_sinc == 1)
+                      	{
+                      		if( (status._send1==true) && (status._receive1==false) )
+							{
+								setStatusReceive1(true);
+								PRINTF("Receive 1\r\n");
+							}
+                      		else if( (status._send1==true) && (status._receive1==true) && (status._send2==true)  && (status._receive2==false))
+							{
+								setStatusReceive2(true);
+								PRINTF("Receive 2\r\n");
+							}
+                      	}
                     }
                 }
                 break;
@@ -1652,7 +1668,7 @@ void SX1276OnDio0Irq( void )
 //					   printTime(sendTs);
 //                   }
 //                   setPacketSinc(!getPacketSinc());
-                	setSendTime();
+                	 setSendTime();
                 }
                 break;
             }

@@ -7,7 +7,7 @@
 
 #include "libsinc.h"
 
-#define DEBUG_SINC 0
+#define DEBUG_SINC 1
 
 /* Time of send transmission of synchronization request by the node*/
 struct TimeStampStruct _sendTs;
@@ -27,6 +27,49 @@ struct TimeStampStruct _tempTs;
 bool _packet_sinc = false;
 
 struct SincStatus _sincStatus;
+
+void startSinc()
+{
+	_sincStatus._packet_sinc=true;
+	_sincStatus._send1=false;
+	_sincStatus._receive1=false;
+	_sincStatus._send2=false;
+	_sincStatus._receive2=false;
+}
+
+void stopSinc()
+{
+	_sincStatus._packet_sinc=false;
+	_sincStatus._send1=false;
+	_sincStatus._receive1=false;
+	_sincStatus._send2=false;
+	_sincStatus._receive2=false;
+}
+
+struct SincStatus getStatus()
+{
+	return _sincStatus;
+}
+
+void setStatusSend1(bool s)
+{
+	_sincStatus._send1=s;
+}
+
+void setStatusReceive1(bool s)
+{
+	_sincStatus._receive1=s;
+}
+
+void setStatusSend2(bool s)
+{
+	_sincStatus._send2=s;
+}
+
+void setStatusReceive2(bool s)
+{
+	_sincStatus._receive2=s;
+}
 
 void sincRTC(struct TimeStampStruct sincTs)
 {
@@ -109,7 +152,7 @@ struct TimeStampStruct getTimeStampFromBuffer(uint8_t* dataBuffer, uint8_t len)
 
 void setSendTime()
 {
-	if(getPacketSinc() == true)
+	if(_sincStatus._packet_sinc==true && _sincStatus._receive1==false)
 	{
 		_sendTs = getRTCTime();
 #if DEBUG_SINC
@@ -117,7 +160,7 @@ void setSendTime()
 		printTime(_sendTs);
 #endif
 	}
-	_packet_sinc=!_packet_sinc;
+//	_packet_sinc=!_packet_sinc;
 }
 
 bool getPacketSinc()

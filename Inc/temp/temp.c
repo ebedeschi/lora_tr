@@ -15,7 +15,7 @@ uint8_t oq = 0; // output queue
 
 uint8_t en = 1;
 
-uint8_t acquire = 1;
+bool acquire = true;
 
 void initTempStruct(struct TempStruct* ele)
 {
@@ -82,12 +82,12 @@ uint8_t checkExtract()
 		return 0;
 }
 
-uint8_t getAcquire()
+bool getAcquire()
 {
 	return acquire;
 }
 
-void setAcquire(uint8_t a)
+void setAcquire(bool a)
 {
 	acquire = a;
 }

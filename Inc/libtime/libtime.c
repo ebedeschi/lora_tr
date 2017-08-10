@@ -190,6 +190,6 @@ uint64_t getMicrosec(struct TimeStampStruct ts)
 
 uint64_t getMillisec(struct TimeStampStruct ts)
 {
-	return (((uint64_t)(ts.tv.tv_sec)) * 1000000) + ( (uint64_t)(ts.tv.tv_usec) / 1000 );
+	return (((uint64_t)(ts.tv.tv_sec)) * 1000) + ( (uint64_t)(ts.tv.tv_usec) / 1000 );
 }
 

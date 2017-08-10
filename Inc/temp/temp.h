@@ -11,7 +11,7 @@
 #include "stm32l4xx_hal.h"
 #include "libtime/libtime.h"
 
-#define DIM_TEMP 20 // temperature vector dimension: 10 elements
+#define DIM_TEMP 10 // temperature vector dimension: 10 elements
 #define DIM_Q 10 // queue dimension
 
 struct TempStruct{
@@ -27,8 +27,8 @@ uint8_t checkExtract();
 
 struct TempStruct extract();
 
-uint8_t getAcquire();
+bool getAcquire();
 
-void setAcquire(uint8_t );
+void setAcquire(bool );
 
 #endif /* TEMP_TEMP_H_ */

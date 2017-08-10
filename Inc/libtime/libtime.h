@@ -6,6 +6,7 @@
 #include "time.h"
 #include "stm32l4xx_hal.h"
 #include "vcom.h"
+#include <stdbool.h>
 
 //#define MY_PRES_A		0x00		// max clock resolution
 //#define MY_PRES_D		0x7FFF		// 32767 <- MAX_COUNT_PRESCALER_SINCRO - 1 = 32768 - 1 = 32767

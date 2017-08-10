@@ -64,6 +64,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "LoRaMac.h"
 #include "lora.h"
 #include "temp/temp.h"
+#include "libsinc/libsinc.h"
 
 /*!
  * Join requests trials duty cycle.
@@ -661,42 +662,73 @@ void lora_fsm( void)
     }
     case DEVICE_STATE_SEND:
     {
-		if(checkExtract()==1)
-		{
-			PRINTF("check 1\r\n");
-			if( NextTx == true )
-			{
+    	struct SincStatus status = getStatus();
+    	if(status._packet_sinc == 1)
+    	{
 			  PrepareTxFrame( );
 			  NextTx = SendFrame( );
-			}
-		}
-		else
-			PRINTF("check 0\r\n");
-//      if (getPacketSinc() == false)
-//      {
-//		  PRINTF("---------------down----------------\n");
-//		  HAL_Delay(10000);
-		  if( ComplianceTest.Running == true )
-		  {
-			  // Schedule next packet transmission as soon as possible
-			  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
-			  TimerStart( &TxNextPacketTimer );
-		  }
-		  else if (LoRaParam->TxEvent == TX_ON_TIMER )
-		  {
-			  // Schedule next packet transmission
-			  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
-			  TimerStart( &TxNextPacketTimer );
-		  }
-//      }
-//      else
-//      {
-//		  PRINTF("---------------sinc----------------\n");
-//		  // Schedule next packet transmission as soon as possible
-//		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
-//		  TimerStart( &TxNextPacketTimer );
-//      }
 
+			  if(status._send2==false)
+			  {
+				  // Schedule next packet transmission as soon as possible
+				  TimerSetValue( &TxNextPacketTimer,  3000); /* 3s */
+				  TimerStart( &TxNextPacketTimer );
+			  }
+			  else
+			  {
+				  if( ComplianceTest.Running == true )
+				  {
+					  // Schedule next packet transmission as soon as possible
+					  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
+					  TimerStart( &TxNextPacketTimer );
+				  }
+				  else if (LoRaParam->TxEvent == TX_ON_TIMER )
+				  {
+					  // Schedule next packet transmission
+					  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
+					  TimerStart( &TxNextPacketTimer );
+				  }
+		//      }
+			  }
+    	}
+    	else
+    	{
+			if(checkExtract()==1)
+			{
+				PRINTF("check 1\r\n");
+				if( NextTx == true )
+				{
+				  PrepareTxFrame( );
+				  NextTx = SendFrame( );
+				}
+			}
+			else
+				PRINTF("check 0\r\n");
+	//      if (getPacketSinc() == false)
+	//      {
+	//		  PRINTF("---------------down----------------\n");
+	//		  HAL_Delay(10000);
+			  if( ComplianceTest.Running == true )
+			  {
+				  // Schedule next packet transmission as soon as possible
+				  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
+				  TimerStart( &TxNextPacketTimer );
+			  }
+			  else if (LoRaParam->TxEvent == TX_ON_TIMER )
+			  {
+				  // Schedule next packet transmission
+				  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
+				  TimerStart( &TxNextPacketTimer );
+			  }
+	//      }
+	//      else
+	//      {
+	//		  PRINTF("---------------sinc----------------\n");
+	//		  // Schedule next packet transmission as soon as possible
+	//		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
+	//		  TimerStart( &TxNextPacketTimer );
+	//      }
+    	}
 
       DeviceState = DEVICE_STATE_SLEEP;
       break;

@@ -209,7 +209,7 @@ void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
 //	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
 	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 
-	if(getAcquire() == 1)
+	if(getAcquire())
 	{
 		uint16_t sT;
 		float   temperatureC;           //variable for temperature[°C] as float

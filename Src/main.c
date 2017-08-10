@@ -267,6 +267,9 @@ int main(void)
 
   struct TimeStampStruct cts = getTimeStampStructfromMillisec(1501671314440);
   setRTCTime(cts);
+//  setAcquire(true);
+  setAcquire(false);
+  startSinc();
 
   /* USER CODE END 2 */
 
@@ -384,102 +387,68 @@ void SystemClock_Config(void)
 
 static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 {
-  uint8_t batteryLevel;
+  //uint8_t batteryLevel;
 
   uint32_t i = 0;
 
-  batteryLevel = HW_GetBatteryLevel( );                     /* 1 (very low) to 254 (fully charged) */
-
-  //AppData->Port = LORAWAN_APP_PORT;
-//  packet_sinc = true;
-//  if (getPacketSinc())
-//  {
-//	  AppData->Port = 6;
-//	  AppData->Buff[i++] = 's';
-//	  AppData->Buff[i++] = 'i';
-//	  AppData->Buff[i++] = 'n';
-//	  AppData->Buff[i++] = 'c';
-//  }
-//  else
-//  {
-//	  AppData->Port = 1;
-//	  AppData->Buff[i++] = 'f';
-//	  AppData->Buff[i++] = 'o';
-//	  AppData->Buff[i++] = 'o';
-//  }
+  //batteryLevel = HW_GetBatteryLevel( );                     /* 1 (very low) to 254 (fully charged) */
 
   *IsTxConfirmed =  LORAWAN_CONFIRMED_MSG;
 
-//  AppData->BuffSize = i;
+  struct SincStatus status = getStatus();
 
-//	char word[20];
-//	error |= SHT2x_MeasureHM(TEMP, &sT);
-//	temperatureC = SHT2x_CalcTemperatureC(sT);
-//	int d1 = temperatureC;
-//	float f2 = temperatureC - d1;
-//	int d2 = trunc(f2 * 10000);
-//	sprintf(word,"%d.%04d", d1, d2);
-////	for(i = 0; i<strlen(word); i++){
-////	sprintf(Buffer+i*2, "%02X", word[i]);
-////	}
-////	PRINTF("%s\n", Buffer);
-//	strcpy(AppData->Buff, word);
-//	PRINTF("%s\n", AppData->Buff);
-//
-//  AppData->BuffSize = strlen(AppData->Buff);
+	if(status._packet_sinc == 1)
+	{
+		if( (status._send1==false) || ( (status._send1==true) && (status._receive1==false) ) || ( (status._send1==true) && (status._receive1==true) && (status._send2==true) && (status._send2==false) ) )
+		{
+			AppData->Port = 6;
+			AppData->Buff[i++] = 's';
+			AppData->BuffSize = i;
+			setStatusSend1(true);
+			setStatusReceive1(false);
+			setStatusSend2(false);
+			setStatusReceive2(false);
+			PRINTF("Send 1\r\n");
+		}
+		else if( (status._send1==true) && (status._receive1==true) && (status._send2==false) )
+		{
+			AppData->Port = 7;
+			AppData->Buff[i++] = 'f';
+			AppData->BuffSize = i;
+			setStatusSend2(true);
+			PRINTF("Send 2\r\n");
+		}
 
-//	uint16_t sT, sH;
-//	float   temperatureC, humidityH;           //variable for temperature[°C] as float
-//	uint8_t  error = 0;              //variable for error code. For codes see system.h
-//	error |= SHT2x_MeasureHM(TEMP, &sT);
-//	temperatureC = SHT2x_CalcTemperatureC(sT);
-//	error |= SHT2x_MeasureHM(HUMIDITY, &sH);
-//	humidityH = SHT2x_CalcRH(sH);
-//
-//	memcpy(&AppData->Buff[0], &temperatureC, 4);
-//	memcpy(&AppData->Buff[4], &humidityH, 4);
-//
-//	AppData->BuffSize = 8;
-//	AppData->Port = 1;
+	}
+	else
+	{
 
-//  AppData->Buff[i++] = 'c';
-//  AppData->Buff[i++] = 'i';
-//  AppData->Buff[i++] = 'a';
-//  AppData->Buff[i++] = 'o';
-//  AppData->Buff[i++] = ' ';
-//  AppData->Buff[i++] = 'm';
-//  AppData->Buff[i++] = 'o';
-//  AppData->Buff[i++] = 'n';
-//  AppData->Buff[i++] = 'd';
-//  AppData->Buff[i++] = 'o';
+		 struct TempStruct ele;
+		 uint64_t t_ms = 0;
+		 if(checkExtract()==1)
+		 {
+			ele = extract();
 
+			PRINTF("Quanti %d\r\n", ele.ct);
+			struct TimeStampStruct ts =  ele.t;
+			printTime(ts);
 
+			memcpy(&(AppData->Buff[0]), &(ele.ct), 1);
+			t_ms = getMillisec(ele.t);
+			memcpy(&(AppData->Buff[1]), &t_ms, 8);
+			i = 1 + 8;
+			for(int k=0;k<ele.ct;k++)
+			{
+				memcpy(&(AppData->Buff[i]), &((ele.temp[k])), 4);
+				i+=4;
+			}
+			AppData->BuffSize = i;
+			AppData->Port = 1;
 
-     struct TempStruct ele;
-     uint64_t t_ms = 0;
-  	 if(checkExtract()==1)
-  	 {
-  		ele = extract();
+			PRINTF("Send ele\r\n");
+		 }
 
-		PRINTF("Quanti %d\r\n", ele.ct);
-		struct TimeStampStruct ts =  ele.t;
-		printTime(ts);
-
-  		memcpy(&(AppData->Buff[0]), &(ele.ct), 2);
-  		t_ms = getMillisec(ele.t);
-  		memcpy(&(AppData->Buff[2]), &t_ms, 8);
-  		i = 2 + 8;
-  		for(int k=0;k<ele.ct;k++)
-  		{
-  			memcpy(&(AppData->Buff[i]), &((ele.temp[k])), 4);
-  			i+=4;
-  		}
-
-  	 }
-	 AppData->BuffSize = i;
-	 AppData->Port = 1;
-
-	 PRINTF("Send ele\r\n");
+	}
 
 }
 
@@ -488,6 +457,7 @@ static void LoraRxData( lora_AppData_t *AppData )
   uint8_t s = 0;
   unsigned long long ts = 0;
   unsigned long long nl=0;
+  PRINTF("LoraRxData\r\n");
   switch (AppData->Port)
   {
   case LORAWAN_APP_PORT:
@@ -496,6 +466,9 @@ static void LoraRxData( lora_AppData_t *AppData )
     break;
   case 6:
 	  sincRTC( getTimeStampFromBuffer(AppData->Buff, AppData->BuffSize) );
+	  stopSinc();
+	  setAcquire(true);
+	  PRINTF("Stop sinc\r\n");
 //	  for(int i=(AppData->BuffSize-1); i>=0; i--)
 //	  {
 //		  nl = (AppData->Buff[i]);
