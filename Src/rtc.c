@@ -204,23 +204,29 @@ struct TimeStampStruct second_sinc_ts;
 extern uint8_t sinc;
 extern struct TimeStampStruct newTs;
 
+uint32_t count = 0;
+
 void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)
 {
 //	HAL_GPIO_TogglePin(OUT_PULSE_GPIO_Port, OUT_PULSE_Pin);
 	HAL_GPIO_TogglePin(LED2_GPIO_Port, LED2_Pin);
 
-	if(getAcquire())
+	if(count==0)
 	{
-		uint16_t sT;
-		float   temperatureC;           //variable for temperature[°C] as float
-		uint8_t  error = 0;              //variable for error code. For codes see system.h
-		error |= SHT2x_MeasureHM(TEMP, &sT);
-		temperatureC = SHT2x_CalcTemperatureC(sT);
-		if(error==0)
-			insert(temperatureC);
-		else
-			insert((float)-100);
+		if(getAcquire())
+		{
+			uint16_t sT;
+			float   temperatureC;           //variable for temperature[°C] as float
+			uint8_t  error = 0;              //variable for error code. For codes see system.h
+			error |= SHT2x_MeasureHM(TEMP, &sT);
+			temperatureC = SHT2x_CalcTemperatureC(sT);
+			if(error==0)
+				insert(temperatureC);
+			else
+				insert((float)-100);
+		}
 	}
+	count=++count%10;
 
 //	if(sinc==1)
 //	{

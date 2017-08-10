@@ -17,6 +17,10 @@ uint8_t en = 1;
 
 bool acquire = true;
 
+struct TempStruct first;
+
+struct sendElement sendEle;
+
 void initTempStruct(struct TempStruct* ele)
 {
 	uint8_t c;
@@ -49,6 +53,32 @@ void insert(float temp)
 		}
 	}
 
+}
+
+void initElementToBeSent()
+{
+	sendEle.sent = true;
+}
+
+struct TempStruct getElementToBeSent()
+{
+	return sendEle.ele;
+}
+
+void setElementToBeSent(struct TempStruct ele)
+{
+	sendEle.ele = ele;
+	sendEle.sent = false;
+}
+
+bool getSendSatusOfElementToBeSent()
+{
+	return sendEle.sent;
+}
+
+void setSendSatusOfElementToBeSent(bool status)
+{
+	sendEle.sent = status;
 }
 
 struct TempStruct extract()

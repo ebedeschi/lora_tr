@@ -265,6 +265,8 @@ int main(void)
 
   PRINTF("VERSION: %X\n", VERSION);
 
+  initElementToBeSent();
+
   struct TimeStampStruct cts = getTimeStampStructfromMillisec(1501671314440);
   setRTCTime(cts);
 //  setAcquire(true);
@@ -427,7 +429,13 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 		 uint64_t t_ms = 0;
 		 if(checkExtract()==1)
 		 {
-			ele = extract();
+			if(getSendSatusOfElementToBeSent())
+			{
+				ele = extract();
+				setElementToBeSent(ele);
+			}
+			else
+				ele = getElementToBeSent();
 
 			PRINTF("Quanti %d\r\n", ele.ct);
 			struct TimeStampStruct ts =  ele.t;

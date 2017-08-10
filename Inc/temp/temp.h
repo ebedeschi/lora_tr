@@ -10,8 +10,9 @@
 
 #include "stm32l4xx_hal.h"
 #include "libtime/libtime.h"
+#include <stdbool.h>
 
-#define DIM_TEMP 10 // temperature vector dimension: 10 elements
+#define DIM_TEMP 50 // temperature vector dimension: 10 elements
 #define DIM_Q 10 // queue dimension
 
 struct TempStruct{
@@ -21,9 +22,24 @@ struct TempStruct{
 	struct TimeStampStruct t;
 };
 
+struct sendElement{
+	struct TempStruct ele;
+	bool sent;
+};
+
 void insert(float );
 
 uint8_t checkExtract();
+
+void initElementToBeSent();
+
+struct TempStruct getElementToBeSent();
+
+void setElementToBeSent(struct TempStruct ele);
+
+bool getSendSatusOfElementToBeSent();
+
+void setSendSatusOfElementToBeSent(bool );
 
 struct TempStruct extract();
 

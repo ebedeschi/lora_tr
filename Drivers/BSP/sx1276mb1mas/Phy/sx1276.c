@@ -1619,7 +1619,6 @@ void SX1276OnDio0Irq( void )
                         RadioEvents->RxDone( RxTxBuffer, SX1276.Settings.LoRaPacketHandler.Size, SX1276.Settings.LoRaPacketHandler.RssiValue, SX1276.Settings.LoRaPacketHandler.SnrValue );
                         PRINTF("RxDone\n");
                         struct SincStatus status = getStatus();
-
                       	if(status._packet_sinc == 1)
                       	{
                       		if( (status._send1==true) && (status._receive1==false) )
@@ -1633,6 +1632,8 @@ void SX1276OnDio0Irq( void )
 								PRINTF("Receive 2\r\n");
 							}
                       	}
+                      	else
+                      		setSendSatusOfElementToBeSent(true);
                     }
                 }
                 break;
