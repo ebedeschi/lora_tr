@@ -302,9 +302,9 @@ int main(void)
 //  setAcquire(true);
   setAcquire(false);
   startSinc();
-  TimerInit( &oneSecond, OnOneSecond );
-  TimerSetValue( &oneSecond,  10000); /* 10s */
-  TimerStart( &oneSecond );
+//  TimerInit( &oneSecond, OnOneSecond );
+//  TimerSetValue( &oneSecond,  10000); /* 10s */
+//  TimerStart( &oneSecond );
 
   /* USER CODE END 2 */
 
@@ -497,9 +497,7 @@ static void LoraTxData( lora_AppData_t *AppData, FunctionalState* IsTxConfirmed)
 
 static void LoraRxData( lora_AppData_t *AppData )
 {
-  uint8_t s = 0;
-  unsigned long long ts = 0;
-  unsigned long long nl=0;
+  struct SincStatus status;
   PRINTF("LoraRxData\r\n");
   switch (AppData->Port)
   {
@@ -508,10 +506,14 @@ static void LoraRxData( lora_AppData_t *AppData )
 		  PRINTF("%c", (char)(AppData->Buff[i]));
     break;
   case 6:
-	  sincRTC( getTimeStampFromBuffer(AppData->Buff, AppData->BuffSize) );
-	  stopSinc();
-	  setAcquire(true);
-	  PRINTF("Stop sinc\r\n");
+	    status = getStatus();
+		if(status._packet_sinc == 1)
+		{
+			sincRTC( getTimeStampFromBuffer(AppData->Buff, AppData->BuffSize) );
+			stopSinc();
+			setAcquire(true);
+			PRINTF("Stop sinc\r\n");
+		}
 //	  for(int i=(AppData->BuffSize-1); i>=0; i--)
 //	  {
 //		  nl = (AppData->Buff[i]);

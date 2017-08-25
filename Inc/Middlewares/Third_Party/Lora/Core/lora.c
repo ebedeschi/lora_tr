@@ -65,6 +65,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include "lora.h"
 #include "temp/temp.h"
 #include "libsinc/libsinc.h"
+#include "../Src/SHT2x/SHT2x.h"
 
 /*!
  * Join requests trials duty cycle.
@@ -74,6 +75,9 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #if defined( USE_BAND_868 )
 
 #include "LoRaMacTest.h"
+
+float appo[] = { 0.0, 0.125333234, 0.248689887, 0.368124553, 0.481753674, 0.587785252, 0.684547106, 0.770513243, 0.844327926, 0.904827052, 0.951056516, 0.982287251, 0.998026728, 0.998026728, 0.982287251, 0.951056516, 0.904827052, 0.844327926, 0.770513243, 0.684547106, 0.587785252, 0.481753674, 0.368124553, 0.248689887, 0.125333234, 2.32152E-14, -0.125333234, -0.248689887, -0.368124553, -0.481753674, -0.587785252, -0.684547106, -0.770513243, -0.844327926, -0.904827052, -0.951056516, -0.982287251, -0.998026728, -0.998026728, -0.982287251, -0.951056516, -0.904827052, -0.844327926, -0.770513243, -0.684547106, -0.587785252, -0.481753674, -0.368124553, -0.248689887, -0.125333234 };
+uint8_t c_appo = 0;
 
 /*!
  * LoRaWAN ETSI duty cycle control enable/disable
@@ -286,7 +290,7 @@ void OnSendEvent( void )
  */
 static void OnTxNextPacketTimerEvent( void )
 {
-//	PRINTF("OnTxNextPacketTimerEvent\n");
+	PRINTF("OnTxNextPacketTimerEvent\n");
     TimerStop( &TxNextPacketTimer );
     OnSendEvent();
 }
@@ -663,7 +667,7 @@ void lora_fsm( void)
     case DEVICE_STATE_SEND:
     {
     	struct SincStatus status = getStatus();
-    	if(status._packet_sinc == 1)
+    	if(status._packet_sinc == 1) // controlla se si è in fase di sicronizzazione o invio
     	{
 			  PrepareTxFrame( );
 			  NextTx = SendFrame( );
@@ -693,6 +697,23 @@ void lora_fsm( void)
     	}
     	else
     	{
+
+    		if(getAcquire())
+    		{
+//    			uint16_t sT;
+//    			float   temperatureC;           //variable for temperature[°C] as float
+//    			uint8_t  error = 0;              //variable for error code. For codes see system.h
+//    			error |= SHT2x_MeasureHM(TEMP, &sT);
+//    			temperatureC = SHT2x_CalcTemperatureC(sT);
+//    			if(error==0)
+//    				insert(temperatureC);
+//    			else
+//    				insert((float)-100);
+
+    			insert(appo[c_appo]);
+    			c_appo = (c_appo+1) % 50;
+    		}
+
 			if(checkExtract()==1)
 			{
 				PRINTF("check 1\r\n");
@@ -704,30 +725,22 @@ void lora_fsm( void)
 			}
 			else
 				PRINTF("check 0\r\n");
-	//      if (getPacketSinc() == false)
-	//      {
-	//		  PRINTF("---------------down----------------\n");
-	//		  HAL_Delay(10000);
-			  if( ComplianceTest.Running == true )
-			  {
-				  // Schedule next packet transmission as soon as possible
-				  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
-				  TimerStart( &TxNextPacketTimer );
-			  }
-			  else if (LoRaParam->TxEvent == TX_ON_TIMER )
-			  {
-				  // Schedule next packet transmission
-				  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
-				  TimerStart( &TxNextPacketTimer );
-			  }
-	//      }
-	//      else
-	//      {
-	//		  PRINTF("---------------sinc----------------\n");
-	//		  // Schedule next packet transmission as soon as possible
-	//		  TimerSetValue( &TxNextPacketTimer,  3000); /* 5s */
-	//		  TimerStart( &TxNextPacketTimer );
-	//      }
+
+			TimerSetValue( &TxNextPacketTimer,  10000); /* 10s */
+			TimerStart( &TxNextPacketTimer );
+
+//			  if( ComplianceTest.Running == true )
+//			  {
+//				  // Schedule next packet transmission as soon as possible
+//				  TimerSetValue( &TxNextPacketTimer,  5000); /* 5s */
+//				  TimerStart( &TxNextPacketTimer );
+//			  }
+//			  else if (LoRaParam->TxEvent == TX_ON_TIMER )
+//			  {
+//				  // Schedule next packet transmission
+//				  TimerSetValue( &TxNextPacketTimer, LoRaParam->TxDutyCycleTime );
+//				  TimerStart( &TxNextPacketTimer );
+//			  }
     	}
 
       DeviceState = DEVICE_STATE_SLEEP;
