@@ -230,6 +230,12 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
 
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+  uint64_t a=0,b=0;
+  while(a++<10000000)
+	  while(b++<1000000);
+  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+
 //  	char word[20];
 //  	error |= SHT2x_MeasureHM(TEMP, &sT);
 //  	temperatureC = SHT2x_CalcTemperatureC(sT);

@@ -669,6 +669,7 @@ void lora_fsm( void)
     	struct SincStatus status = getStatus();
     	if(status._packet_sinc == 1) // controlla se si è in fase di sicronizzazione o invio
     	{
+    		  PRINTF("_packet_sinc 1\r\n");
 			  PrepareTxFrame( );
 			  NextTx = SendFrame( );
 
@@ -726,6 +727,7 @@ void lora_fsm( void)
 			else
 				PRINTF("check 0\r\n");
 
+			TimerInit( &TxNextPacketTimer, OnTxNextPacketTimerEvent );
 			TimerSetValue( &TxNextPacketTimer,  10000); /* 10s */
 			TimerStart( &TxNextPacketTimer );
 
